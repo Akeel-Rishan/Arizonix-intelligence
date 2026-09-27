@@ -1,0 +1,16 @@
+.env
+.env.local
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+.npm-cache/
+*.py[cod]
+node_modules/
+.next/
+playwright-report/
+test-results/
+coverage/
+.DS_Store
+Thumbs.db
