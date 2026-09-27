@@ -12,4 +12,3 @@ export const navigationItems: readonly NavigationItem[] = [
   { label: "Human Review", href: "/review", shortLabel: "HR" },
   { label: "Settings", href: "/settings", shortLabel: "ST" },
 ] as const;
-

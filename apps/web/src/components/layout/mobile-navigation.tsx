@@ -27,7 +27,7 @@ export function MobileNavigation() {
       }
       if (event.key === "Tab" && panelRef.current) {
         const focusable = Array.from(
-          panelRef.current.querySelectorAll<HTMLElement>("button, a[href]")
+          panelRef.current.querySelectorAll<HTMLElement>("button, a[href]"),
         );
         const first = focusable[0];
         const last = focusable.at(-1);
@@ -72,14 +72,23 @@ export function MobileNavigation() {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Primary navigation">
+        <div
+          className="fixed inset-0 z-40 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Primary navigation"
+        >
           <button
             aria-label="Close navigation"
             className="absolute inset-0 bg-slate-950/60"
             onClick={() => closeNavigation(true)}
             type="button"
           />
-          <div ref={panelRef} id="mobile-navigation" className="absolute right-0 top-0 flex min-h-[100dvh] w-[min(88vw,22rem)] flex-col bg-slate-950 p-5 text-white shadow-2xl shadow-slate-950/30">
+          <div
+            ref={panelRef}
+            id="mobile-navigation"
+            className="absolute right-0 top-0 flex min-h-[100dvh] w-[min(88vw,22rem)] flex-col bg-slate-950 p-5 text-white shadow-2xl shadow-slate-950/30"
+          >
             <div className="flex items-center justify-between border-b border-slate-800 pb-5">
               <p className="font-semibold">Navigation</p>
               <button
@@ -94,7 +103,8 @@ export function MobileNavigation() {
             <nav aria-label="Primary" className="mt-6">
               <ul className="space-y-2">
                 {navigationItems.map((item) => {
-                  const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                  const active =
+                    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                   return (
                     <li key={item.href}>
                       <Link

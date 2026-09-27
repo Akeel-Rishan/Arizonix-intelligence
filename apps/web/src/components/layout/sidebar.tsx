@@ -16,7 +16,9 @@ export function Sidebar() {
     <aside className="hidden min-h-[100dvh] w-72 shrink-0 border-r border-slate-200 bg-slate-950 px-5 py-7 text-slate-100 lg:flex lg:flex-col">
       <div className="px-3">
         <p className="text-lg font-semibold tracking-[-0.025em]">Arizonix Intelligence</p>
-        <p className="mt-1.5 text-sm leading-5 text-slate-400">Evidence-driven business research.</p>
+        <p className="mt-1.5 text-sm leading-5 text-slate-400">
+          Evidence-driven business research.
+        </p>
       </div>
       <nav aria-label="Primary" className="mt-10">
         <ul className="space-y-1.5">
@@ -33,7 +35,10 @@ export function Sidebar() {
                   }`}
                   href={item.href}
                 >
-                  <span aria-hidden="true" className="w-6 font-mono text-[10px] font-bold tracking-wider">
+                  <span
+                    aria-hidden="true"
+                    className="w-6 font-mono text-[10px] font-bold tracking-wider"
+                  >
                     {item.shortLabel}
                   </span>
                   {item.label}
@@ -47,4 +52,3 @@ export function Sidebar() {
     </aside>
   );
 }
-

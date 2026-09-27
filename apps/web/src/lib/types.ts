@@ -8,4 +8,3 @@ export type HealthCheckState =
   | { kind: "loading" }
   | { kind: "healthy"; data: HealthResponse }
   | { kind: "error"; message: string };
-

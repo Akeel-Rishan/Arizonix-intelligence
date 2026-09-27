@@ -39,11 +39,19 @@ export function ApiHealthCard() {
   }, [runCheck]);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7" aria-labelledby="api-health-title">
+    <section
+      className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7"
+      aria-labelledby="api-health-title"
+    >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-cyan-800">System connection</p>
-          <h2 id="api-health-title" className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-950">API health</h2>
+          <h2
+            id="api-health-title"
+            className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-950"
+          >
+            API health
+          </h2>
         </div>
         <StatusBadge state={state} />
       </div>
@@ -61,7 +69,9 @@ export function ApiHealthCard() {
         {state.kind === "healthy" ? (
           <div data-testid="health-success">
             <p className="font-medium text-slate-950">Connected to {state.data.service}</p>
-            <p className="mt-1 text-sm text-slate-600">Liveness check passed. API version {state.data.version}.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Liveness check passed. API version {state.data.version}.
+            </p>
           </div>
         ) : null}
 
@@ -84,7 +94,8 @@ export function ApiHealthCard() {
 }
 
 function StatusBadge({ state }: { state: HealthCheckState }) {
-  const label = state.kind === "healthy" ? "Healthy" : state.kind === "error" ? "Unavailable" : "Checking";
+  const label =
+    state.kind === "healthy" ? "Healthy" : state.kind === "error" ? "Unavailable" : "Checking";
   const styles =
     state.kind === "healthy"
       ? "border-cyan-300 bg-cyan-50 text-cyan-900"
@@ -92,5 +103,11 @@ function StatusBadge({ state }: { state: HealthCheckState }) {
         ? "border-rose-200 bg-rose-50 text-rose-800"
         : "border-slate-200 bg-slate-100 text-slate-600";
 
-  return <span className={`rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${styles}`}>{label}</span>;
+  return (
+    <span
+      className={`rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${styles}`}
+    >
+      {label}
+    </span>
+  );
 }

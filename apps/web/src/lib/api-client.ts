@@ -1,6 +1,6 @@
 import type { HealthResponse } from "@/lib/types";
+import { getPublicConfig, PublicConfigurationError } from "@/lib/config";
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
 const REQUEST_TIMEOUT_MS = 5_000;
 
 export class HealthCheckError extends Error {
@@ -21,10 +21,6 @@ function isHealthResponse(value: unknown): value is HealthResponse {
   );
 }
 
-export function getApiBaseUrl(): string {
-  return (process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-}
-
 export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse> {
   const timeoutController = new AbortController();
   const timeoutId = window.setTimeout(() => timeoutController.abort("timeout"), REQUEST_TIMEOUT_MS);
@@ -32,7 +28,17 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse>
   signal?.addEventListener("abort", abortFromCaller, { once: true });
 
   try {
-    const response = await fetch(`${getApiBaseUrl()}/api/v1/health`, {
+    let apiBaseUrl: string;
+    try {
+      apiBaseUrl = getPublicConfig().apiBaseUrl;
+    } catch (error: unknown) {
+      if (error instanceof PublicConfigurationError) {
+        throw new HealthCheckError(error.userMessage);
+      }
+      throw error;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/api/v1/health`, {
       headers: { Accept: "application/json" },
       method: "GET",
       signal: timeoutController.signal,
@@ -45,10 +51,14 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse>
     try {
       payload = await response.json();
     } catch {
-      throw new HealthCheckError("The API response was not recognized. Check that both apps are current.");
+      throw new HealthCheckError(
+        "The API response was not recognized. Check that both apps are current.",
+      );
     }
     if (!isHealthResponse(payload)) {
-      throw new HealthCheckError("The API response was not recognized. Check that both apps are current.");
+      throw new HealthCheckError(
+        "The API response was not recognized. Check that both apps are current.",
+      );
     }
     return payload;
   } catch (error: unknown) {

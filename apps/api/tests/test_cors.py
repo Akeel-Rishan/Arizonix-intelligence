@@ -5,7 +5,14 @@ from arizonix_api.main import create_app
 
 
 def make_client() -> TestClient:
-    return TestClient(create_app(Settings(allowed_origins=["http://frontend.test"])))
+    settings = Settings(
+        _env_file=None,
+        app_environment="test",
+        app_version="0.1.0",
+        log_level="info",
+        allowed_origins=["http://frontend.test"],
+    )
+    return TestClient(create_app(settings))
 
 
 def test_allowed_origin_receives_cors_header() -> None:

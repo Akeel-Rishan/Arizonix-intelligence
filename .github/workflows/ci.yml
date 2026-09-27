@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-quality:
+    name: Backend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: 0.11.14
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - name: Install locked dependencies
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Test
+        run: uv run pytest
+
+  frontend-quality:
+    name: Frontend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.22.0
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Check formatting
+        run: npm run format:check
+      - name: Test public configuration
+        run: npm run test:config
+      - name: Type-check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+
+  browser-integration:
+    name: Browser integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
+      RUN_LIVE_INTEGRATION: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: 0.11.14
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.22.0
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install backend dependencies
+        run: uv sync --project ../api --frozen
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run mocked UI and real integration checks
+        run: npm run test:e2e
+      - name: Upload browser failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          if-no-files-found: ignore
+          retention-days: 3

@@ -33,7 +33,9 @@ test("health card accepts only the expected contract", async ({ page }) => {
   await expect(page.getByTestId("health-success")).toContainText("Connected to arizonix-api");
 
   await page.unroute(healthUrl);
-  await page.route(healthUrl, (route) => route.fulfill({ json: { status: "ok", service: "wrong-service", version: "0.1.0" } }));
+  await page.route(healthUrl, (route) =>
+    route.fulfill({ json: { status: "ok", service: "wrong-service", version: "0.1.0" } }),
+  );
   await page.reload();
   await expect(page.getByTestId("health-error")).toContainText("response was not recognized");
 });
@@ -56,7 +58,13 @@ test("mobile navigation is keyboard usable and layout does not overflow", async 
   await page.setViewportSize({ width: 375, height: 812 });
   await page.route(healthUrl, (route) => route.abort("connectionrefused"));
   await page.goto("/");
-  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    )
+    .toBe(true);
 
   const menu = page.getByRole("button", { name: "Menu" });
   await menu.click();

@@ -1,0 +1,13 @@
+.env
+.env.*
+.next/
+node_modules/
+playwright-report/
+test-results/
+coverage/
+tsconfig.tsbuildinfo
+.npm-cache/
+.git/
+.gitignore
+Dockerfile*
+

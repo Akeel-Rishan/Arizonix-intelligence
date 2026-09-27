@@ -1,53 +1,61 @@
 # Development progress
 
-## Current step
+## Step status
 
-Step 1.1: local application foundation
+- Step 1.1: **user-verified**
+- Step 1.2: **awaiting user verification**
 
-Status: **awaiting user verification**
+## Step 1.2 scope implemented
 
-## Scope implemented
+- Centralized, validated backend configuration for environment, version, log level, and explicit CORS origins.
+- Centralized frontend public API origin parsing with normalization and useful invalid-configuration behavior.
+- Tests isolated from developer `.env` files, with focused default, override, invalid, CORS, and public URL coverage.
+- Prettier formatting and configuration-test scripts added alongside existing lint, type-check, build, and browser scripts.
+- Optional two-service Docker Compose smoke environment with pinned runtime images, non-root processes, loopback publishing, health checks, and build-time browser configuration.
+- Three-job GitHub Actions workflow for backend quality, frontend quality, and mocked plus real browser integration.
+- Direct development, Compose, configuration, troubleshooting, and architecture documentation.
+- Generated TypeScript build metadata moved under ignored `.next` output.
 
-- FastAPI application factory, typed settings, explicit API metadata, restricted CORS, and `GET /api/v1/health` liveness contract.
-- Isolated pytest coverage for the health contract, allowed and denied CORS origins, and comma-separated environment configuration.
-- Next.js App Router shell with strict TypeScript, Tailwind CSS, semantic landmarks, skip link, active navigation, responsive drawer, focus management, and reduced-motion handling.
-- Real typed frontend health client with cancellation, five-second timeout, contract validation, honest failures, duplicate-request prevention, and manual retry.
-- Six working application destinations with honest empty states and no fabricated business data.
-- Playwright smoke coverage for routing, valid and invalid API responses, network failure, retry, mobile navigation, keyboard behavior, and overflow at 375px, 768px, and 1440px.
-- An opt-in live integration test that starts the real backend, verifies success, stops it to verify the failure state, restarts it, and verifies retry recovery.
-- Reproducible Python and npm lockfiles plus local setup and architecture documentation.
-
-No full project proposal was present in the repository at implementation time. The supplied Step 1.1 brief was used without inventing later-step requirements.
+No database, Supabase, Redis, worker, LangGraph dependency, agent, source adapter, external provider, authentication, outreach, deployment, or business feature was added.
 
 ## Verification record
 
-Executed on 2026-09-27 with Node.js 22.22.0, npm 10.9.4, uv 0.11.14, and uv-managed Python 3.12.13.
+Executed locally on 2026-09-28 with Node.js 22.22.0, npm 10.9.4, uv 0.11.14, uv-managed Python 3.12.13, Docker CLI 29.4.0, Docker Compose 5.1.2, and Chromium 153 installed by Playwright.
 
-| Command | Outcome |
-| --- | --- |
-| `uv lock` | PASS. Resolved 31 packages and created `apps/api/uv.lock`. |
-| `uv sync --frozen` | PASS. Installed the exact locked backend environment. |
-| `uv run pytest` | PASS. 4 tests passed. One upstream FastAPI/Starlette deprecation warning notes the future `httpx2` transition. |
-| `uv run ruff check .` | PASS. |
-| `uv run ruff format --check .` | PASS. 8 files already formatted. |
-| `npm ci` / lockfile install equivalence | PASS. `npm install` created the lockfile; the final clean-install check uses `npm ci`. |
-| `npm run lint` | PASS. |
-| `npm run typecheck` | PASS. |
-| `npm run build` | PASS. Next.js generated `/`, `/prospects`, `/research`, `/evidence`, `/review`, and `/settings`. |
-| `npm run test:e2e` | PASS. Intercepted browser smoke suite passed; live integration is skipped unless explicitly enabled. |
-| `RUN_LIVE_INTEGRATION=1 npm run test:e2e` | PASS. Real backend success, outage, restart, and retry recovery were verified. |
+| Check                              | Command                                                                                                  | Outcome                                                                                       |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Backend frozen install             | `uv sync --frozen`                                                                                       | PASS. Locked environment checked without dependency changes.                                  |
+| Backend lint                       | `uv run ruff check .`                                                                                    | PASS.                                                                                         |
+| Backend formatting                 | `uv run ruff format --check .`                                                                           | PASS. 8 files formatted.                                                                      |
+| Backend tests                      | `uv run pytest`                                                                                          | PASS. 11 tests passed.                                                                        |
+| Frontend frozen install            | `npm ci --cache .npm-cache`                                                                              | PASS. 370 packages audited, zero vulnerabilities reported.                                    |
+| Frontend lint                      | `npm run lint`                                                                                           | PASS.                                                                                         |
+| Frontend formatting                | `npm run format:check`                                                                                   | PASS.                                                                                         |
+| Public configuration tests         | `npm run test:config`                                                                                    | PASS. 3 tests passed.                                                                         |
+| TypeScript                         | `npm run typecheck`                                                                                      | PASS.                                                                                         |
+| Production build                   | `npm run build`                                                                                          | PASS. All six application routes generated with standalone output.                            |
+| Browser smoke and live integration | `RUN_LIVE_INTEGRATION=1 npm run test:e2e`                                                                | PASS. 6 passed; the separately gated invalid-configuration test was skipped in this run.      |
+| Invalid configuration UI           | `EXPECT_INVALID_PUBLIC_CONFIG=1 npx playwright test tests/e2e/configuration.spec.ts` with an invalid URL | PASS. 1 test passed.                                                                          |
+| Direct startup                     | API on 8000 and web on 3000, then HTTP probes                                                            | PASS. API contract returned 200 and the overview page returned 200.                           |
+| Responsive widths                  | Playwright at 375px, 768px, and 1440px                                                                   | PASS. Navigation remained usable and no page overflow was detected.                           |
+| Compose validation                 | `docker compose config`                                                                                  | PASS. Two services, loopback ports, build argument, and health dependency resolved correctly. |
+| Container build/start/health       | `docker compose up --build --wait`                                                                       | NOT RUN. Docker CLI was installed but the local daemon pipe was unavailable.                  |
+| Browser-to-container API           | Browser against the healthy Compose stack                                                                | NOT RUN. Depends on the unavailable Docker daemon.                                            |
+| Hosted GitHub Actions              | Push or pull request run                                                                                 | NOT RUN. The workflow was created locally and was not pushed.                                 |
 
-The dependency selection was checked against current official release information. TypeScript is intentionally pinned to the compatible 6.x line and ESLint to 9.x because the current Next.js 16.3.6 lint stack does not yet support TypeScript 7 through its bundled parser.
+The backend tests emit one upstream FastAPI/Starlette warning about the future `httpx2` transition. The built-in Node TypeScript test runner emits an experimental/module-detection warning. Neither warning changes the passing outcomes.
 
-## Remaining manual checks
+## Remaining manual verification
 
-- User review of appearance, copy, and keyboard flow in their preferred browser and operating system.
-- User confirmation that ports 3000 and 8000 are available in their local setup.
-- Dark mode is not part of this light-theme application-shell brief and was not added.
+1. Start Docker Desktop or another compatible daemon.
+2. Run `docker compose up --build --wait` from the repository root.
+3. Run `docker compose ps` and confirm both services are healthy.
+4. Open `http://127.0.0.1:3000` and confirm the health card connects to the containerized API.
+5. Run `docker compose down`.
+6. Push through the normal user workflow and verify all three hosted CI jobs.
 
 ## Next planned step
 
-Step 1.2: development infrastructure, configuration, CI, and quality checks.
+Step 1.3: architecture decisions, domain contracts, proposal coverage map, and evaluation fixtures.
 
-Step 1.2 has not been implemented.
-
+Step 1.3 has not been implemented.

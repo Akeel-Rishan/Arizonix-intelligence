@@ -15,11 +15,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sidebar />
       <div className="min-w-0 flex-1">
         <MobileNavigation />
-        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl px-5 py-8 outline-none sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-6xl px-5 py-8 outline-none sm:px-8 sm:py-10 lg:px-12 lg:py-12"
+        >
           {children}
         </main>
       </div>
     </div>
   );
 }
-

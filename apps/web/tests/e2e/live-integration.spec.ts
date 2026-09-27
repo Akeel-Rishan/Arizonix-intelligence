@@ -17,19 +17,28 @@ async function startApi(): Promise<ChildProcess> {
     ["-m", "uvicorn", "arizonix_api.main:app", "--host", "127.0.0.1", "--port", "8000"],
     {
       cwd: apiDirectory,
-      env: { ...process.env, ARIZONIX_ALLOWED_ORIGINS: "http://127.0.0.1:3100" },
+      env: {
+        ...process.env,
+        ARIZONIX_ALLOWED_ORIGINS: "http://127.0.0.1:3100",
+        ARIZONIX_APP_ENVIRONMENT: "test",
+        ARIZONIX_APP_VERSION: "0.1.0",
+        ARIZONIX_LOG_LEVEL: "info",
+      },
       stdio: "ignore",
     },
   );
 
   await expect
-    .poll(async () => {
-      try {
-        return (await fetch("http://127.0.0.1:8000/api/v1/health")).ok;
-      } catch {
-        return false;
-      }
-    }, { timeout: 15_000 })
+    .poll(
+      async () => {
+        try {
+          return (await fetch("http://127.0.0.1:8000/api/v1/health")).ok;
+        } catch {
+          return false;
+        }
+      },
+      { timeout: 15_000 },
+    )
     .toBe(true);
   return child;
 }
@@ -59,4 +68,3 @@ test("real API failure is visible and retry recovers after restart", async ({ pa
     await stopApi(api);
   }
 });
-

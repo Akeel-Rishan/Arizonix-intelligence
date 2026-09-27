@@ -1,0 +1,30 @@
+name: arizonix-intelligence
+
+services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      ARIZONIX_ALLOWED_ORIGINS: "${ARIZONIX_ALLOWED_ORIGINS:-http://127.0.0.1:3000,http://localhost:3000}"
+      ARIZONIX_APP_ENVIRONMENT: "${ARIZONIX_APP_ENVIRONMENT:-development}"
+      ARIZONIX_APP_VERSION: "${ARIZONIX_APP_VERSION:-0.1.0}"
+      ARIZONIX_LOG_LEVEL: "${ARIZONIX_LOG_LEVEL:-info}"
+    init: true
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-8000}:8000"
+    stop_grace_period: 10s
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: "${NEXT_PUBLIC_API_BASE_URL:-http://127.0.0.1:8000}"
+    depends_on:
+      api:
+        condition: service_healthy
+    init: true
+    ports:
+      - "127.0.0.1:${WEB_HOST_PORT:-3000}:3000"
+    stop_grace_period: 15s
