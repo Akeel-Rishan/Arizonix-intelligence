@@ -14,9 +14,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:config": "node --experimental-strip-types --test tests/config.test.mts",
+    "test:auth": "node --experimental-strip-types --test tests/auth.test.mts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.2",
     "next": "16.3.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"

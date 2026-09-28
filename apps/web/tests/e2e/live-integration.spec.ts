@@ -3,7 +3,10 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
+import { signIn } from "./support/auth";
+
 const runLiveIntegration = process.env.RUN_LIVE_INTEGRATION === "1";
+const apiPort = 8011;
 const apiDirectory = path.resolve(process.cwd(), "../api");
 const pythonExecutable = path.join(
   apiDirectory,
@@ -14,7 +17,7 @@ const pythonExecutable = path.join(
 async function startApi(): Promise<ChildProcess> {
   const child = spawn(
     pythonExecutable,
-    ["-m", "uvicorn", "arizonix_api.main:app", "--host", "127.0.0.1", "--port", "8000"],
+    ["-m", "uvicorn", "arizonix_api.main:app", "--host", "127.0.0.1", "--port", String(apiPort)],
     {
       cwd: apiDirectory,
       env: {
@@ -32,7 +35,7 @@ async function startApi(): Promise<ChildProcess> {
     .poll(
       async () => {
         try {
-          return (await fetch("http://127.0.0.1:8000/api/v1/health")).ok;
+          return (await fetch(`http://127.0.0.1:${apiPort}/api/v1/health`)).ok;
         } catch {
           return false;
         }
@@ -54,7 +57,7 @@ test("real API failure is visible and retry recovers after restart", async ({ pa
 
   let api = await startApi();
   try {
-    await page.goto("/");
+    await signIn(page);
     await expect(page.getByTestId("health-success")).toContainText("Connected to arizonix-api");
 
     await stopApi(api);

@@ -8,6 +8,8 @@ SETTING_NAMES = (
     "ARIZONIX_APP_VERSION",
     "ARIZONIX_LOG_LEVEL",
     "ARIZONIX_ALLOWED_ORIGINS",
+    "ARIZONIX_SUPABASE_URL",
+    "ARIZONIX_SUPABASE_JWT_AUDIENCE",
 )
 
 
@@ -24,6 +26,9 @@ def test_local_defaults_are_valid() -> None:
     assert settings.app_version == "0.1.0"
     assert settings.log_level is LogLevel.INFO
     assert settings.allowed_origins == ["http://127.0.0.1:3000", "http://localhost:3000"]
+    assert settings.supabase_url is None
+    assert settings.supabase_jwt_issuer is None
+    assert settings.supabase_jwks_url is None
 
 
 def test_explicit_environment_overrides(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -90,3 +95,22 @@ def test_json_array_origins_are_supported(monkeypatch: pytest.MonkeyPatch) -> No
         "http://127.0.0.1:3000",
         "https://research.example",
     ]
+
+
+def test_supabase_url_derives_trusted_auth_endpoints(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ARIZONIX_SUPABASE_URL", "https://project.supabase.co/")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.supabase_url == "https://project.supabase.co"
+    assert settings.supabase_jwt_issuer == "https://project.supabase.co/auth/v1"
+    assert settings.supabase_jwks_url == (
+        "https://project.supabase.co/auth/v1/.well-known/jwks.json"
+    )
+
+
+def test_supabase_url_rejects_paths(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ARIZONIX_SUPABASE_URL", "https://project.supabase.co/auth/v1")
+
+    with pytest.raises(ValidationError, match="Supabase URL must not contain a path"):
+        Settings(_env_file=None)

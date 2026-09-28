@@ -8,7 +8,13 @@ RUN npm ci
 FROM node:22.22.0-bookworm-slim AS builder
 
 ARG NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+ARG NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL \
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
     NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
@@ -36,4 +42,3 @@ HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 \
   CMD ["node", "-e", "fetch('http://127.0.0.1:3000').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
 
 CMD ["node", "server.js"]
-

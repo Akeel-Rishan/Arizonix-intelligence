@@ -62,6 +62,12 @@ class Settings(BaseSettings):
     allowed_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://127.0.0.1:3000", "http://localhost:3000"]
     )
+    supabase_url: str | None = None
+    supabase_jwt_audience: str = "authenticated"
+    supabase_jwks_cache_seconds: int = Field(default=600, ge=1, le=86_400)
+    supabase_jwks_refresh_cooldown_seconds: int = Field(default=30, ge=1, le=3_600)
+    supabase_http_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
+    supabase_jwt_clock_skew_seconds: int = Field(default=30, ge=0, le=300)
 
     @field_validator("app_version")
     @classmethod
@@ -95,6 +101,39 @@ class Settings(BaseSettings):
             raise ValueError("at least one allowed CORS origin is required")
         normalized = [_normalize_origin(origin) for origin in value]
         return list(dict.fromkeys(normalized))
+
+    @field_validator("supabase_url", mode="before")
+    @classmethod
+    def normalize_supabase_url(cls, value: object) -> object:
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return None
+        if not isinstance(value, str):
+            return value
+        try:
+            return _normalize_origin(value)
+        except ValueError as error:
+            raise ValueError(str(error).replace("CORS origin", "Supabase URL")) from error
+
+    @field_validator("supabase_jwt_audience")
+    @classmethod
+    def validate_supabase_jwt_audience(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("Supabase JWT audience must not be empty")
+        return normalized
+
+    @property
+    def supabase_jwt_issuer(self) -> str | None:
+        if self.supabase_url is None:
+            return None
+        return f"{self.supabase_url}/auth/v1"
+
+    @property
+    def supabase_jwks_url(self) -> str | None:
+        issuer = self.supabase_jwt_issuer
+        if issuer is None:
+            return None
+        return f"{issuer}/.well-known/jwks.json"
 
 
 @lru_cache

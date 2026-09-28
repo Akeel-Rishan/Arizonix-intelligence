@@ -1,8 +1,8 @@
 # Arizonix Intelligence
 
-Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides a reproducible local foundation: a FastAPI liveness API, a responsive Next.js dashboard shell, typed configuration, versioned domain contracts, synthetic evaluation fixtures, automated quality checks, optional containers, and CI definitions.
+Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides a reproducible local foundation with Supabase email/password authentication, protected application routes, a locally verified API identity boundary, typed domain contracts, synthetic evaluation fixtures, automated quality checks, optional containers, and CI definitions.
 
-It does not yet include authentication, databases, agents, scraping, outreach, external providers, deployment, or production security controls.
+It does not yet include application database tables, workspace membership or roles, agents, scraping, outreach, external research providers, deployment, or complete production security controls.
 
 ## Direct local development
 
@@ -30,6 +30,8 @@ npm run dev
 - Dashboard: <http://127.0.0.1:3000>
 - API health: <http://127.0.0.1:8000/api/v1/health>
 - FastAPI documentation: <http://127.0.0.1:8000/docs>
+
+Before signing in, replace the Supabase placeholders in both copied environment files and complete the dashboard settings in [authentication.md](docs/authentication.md). The full environment contract is in [configuration.md](docs/configuration.md). Missing auth configuration fails closed with setup guidance; health remains public.
 
 See [development.md](docs/development.md) for macOS/Linux commands, browser tests, supported runtimes, and troubleshooting.
 
@@ -69,6 +71,7 @@ npm ci
 npm run lint
 npm run format:check
 npm run test:config
+npm run test:auth
 npm run typecheck
 npm run build
 npm run test:e2e
@@ -81,4 +84,4 @@ Core semantics and decisions are documented in [domain-model.md](docs/domain-mod
 [requirements-coverage.md](docs/requirements-coverage.md). Evaluation fixtures and the important limit
 of structural validation are described in [evals/README.md](evals/README.md).
 
-Authentication and production security are not implemented. Do not treat this foundation or its Compose workflow as production-ready.
+Authentication is implemented as a narrow identity boundary, not a complete authorization system. Do not treat this foundation or its Compose workflow as production-ready.

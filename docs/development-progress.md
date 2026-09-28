@@ -4,7 +4,8 @@
 
 - Step 1.1: **user-verified**
 - Step 1.2: **user-verified**
-- Step 1.3: **awaiting user verification**
+- Step 1.3: **user-verified**
+- Step 2.1: **awaiting user verification**
 
 ## Completed foundation
 
@@ -68,8 +69,35 @@ The full project proposal and numbered roadmap are not present in the repository
 authoritative original at `docs/project-proposal.md`; then reconcile real section numbers and titles
 without replacing or paraphrasing the source.
 
+## Step 2.1 scope implemented
+
+Step 2.1 adds Supabase email/password SSR authentication, email confirmation, safe redirects, local sign-out, protected application routes, a verified FastAPI bearer boundary, `/api/v1/me`, bounded JWKS caching, offline auth tests, and dashboard setup documentation. It deliberately does not add database tables, workspaces, roles, RLS, business records, agents, or outreach.
+
+Live Supabase verification is not run automatically because the repository contains no committed real project credentials. The deterministic browser suite uses the actual Supabase client libraries against a local protocol-compatible mock and does not add an auth bypass.
+
+## Step 2.1 verification record
+
+Executed locally on 2026-09-28.
+
+| Check                                                                    | Outcome                                                               |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Backend Ruff lint and format                                             | PASS; 27 Python files checked                                         |
+| Backend tests                                                            | PASS; 46 tests with generated signing keys and mocked JWKS            |
+| Synthetic fixture validation                                             | PASS; 12 offline cases                                                |
+| Frontend ESLint and Prettier                                             | PASS                                                                  |
+| Frontend configuration tests                                             | PASS; 5 tests                                                         |
+| Frontend redirect-security tests                                         | PASS; 2 tests                                                         |
+| Frontend TypeScript                                                      | PASS                                                                  |
+| Next.js production build                                                 | PASS; protected routes are dynamically rendered                       |
+| Deterministic browser suite plus real API lifecycle                      | PASS; 13 tests, with the separately gated invalid-config case skipped |
+| Separately gated invalid-config browser case                             | PASS; 1 test                                                          |
+| Compose configuration rendering                                          | PASS; Docker reported only a local config-file permission warning     |
+| Real Supabase registration, email delivery, session refresh, and sign-in | **NOT RUN**; no real project credentials were supplied                |
+| Docker image build/start                                                 | NOT RUN                                                               |
+| Hosted GitHub Actions                                                    | NOT RUN; changes have not been pushed                                 |
+
+The test-only Supabase-compatible server validates application flows using the real Supabase SDK and SSR cookies, but it does not prove live provider configuration or email delivery. The real-process API lifecycle check uses an isolated port so an existing development API cannot invalidate its CORS result.
+
 ## Next planned step
 
-Step 2.1: Supabase authentication and protected routes.
-
-Step 2.1 has not been implemented.
+Step 2.2: workspaces, memberships, roles, database migrations, and row-level security. It is not implemented in Step 2.1.

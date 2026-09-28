@@ -6,15 +6,22 @@ Arizonix Intelligence currently consists of two independently deployable applica
 
 ```text
 Browser at 127.0.0.1:3000
-        |
-        | GET {public API origin}/api/v1/health
-        v
-FastAPI at 127.0.0.1:8000
+  |                 |
+  | Supabase SSR   | GET /api/v1/health (public)
+  | session        | GET /api/v1/me + Bearer access JWT
+  v                 v
+Supabase Auth      FastAPI at 127.0.0.1:8000
+                         |
+                         | asymmetric JWKS verification
+                         v
+                  Supabase Auth JWKS
 ```
 
-The Next.js App Router application renders the research shell and limits client-side interactivity to route-aware navigation and the API health card. Its configuration module validates one browser-visible API origin. The typed health client adds the versioned path, applies a bounded timeout and cancellation, validates the response contract, and does not poll.
+The Next.js App Router application uses `@supabase/ssr` with a per-request server client, browser client, and Next.js 16 proxy. The proxy refreshes cookie-backed sessions; the protected route-group layout independently verifies claims before rendering the research shell. Login, sign-up, email confirmation, check-email, and sign-out are public or server-action boundaries. Return destinations are restricted to local non-auth paths.
 
-The FastAPI application uses an injectable application factory and Pydantic Settings. It exposes one versioned liveness endpoint, with explicit environment, version, log-level, and CORS configuration. The endpoint remains independent of databases, workers, and providers and does not imply their readiness.
+The FastAPI application keeps `/api/v1/health` public and protects `/api/v1/me` with an injectable bearer-token verifier. It derives the expected issuer and JWKS URL from a trusted Supabase origin; accepts only RS256 or ES256; verifies signature, issuer, audience, expiry, issued-at time, and UUID subject; and returns only user ID and optional email. Its bounded JWKS cache allows stale known keys during a temporary outage, throttles unknown-key refreshes, and fails closed when trust cannot be established.
+
+The web API client attaches the access token only to the configured Arizonix API origin. A 401 triggers one coordinated refresh and one retry. A 503 remains a distinct verification-unavailable state. No service-role key, workspace membership, roles, row-level security, database schema, or business authorization exists in this step.
 
 ## Domain and evaluation boundary
 
@@ -66,7 +73,7 @@ The workflow cancels superseded runs, uses bounded timeouts and readiness pollin
 
 Future steps may add:
 
-- Supabase/PostgreSQL for workspace-scoped operational records, evidence, claims, decisions, and audit history.
+- Supabase/PostgreSQL application tables for workspace-scoped operational records, evidence, claims, decisions, and audit history. Supabase Auth alone is implemented.
 - pgvector for evidence retrieval where semantic similarity is justified.
 - Redis and Celery for bounded background work, scheduling, retries, and task visibility.
 - LangGraph for explicit, inspectable coordination among specialized analysis and verification agents.

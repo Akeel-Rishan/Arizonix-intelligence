@@ -65,6 +65,8 @@ jobs:
         run: npm run format:check
       - name: Test public configuration
         run: npm run test:config
+      - name: Test authentication helpers
+        run: npm run test:auth
       - name: Type-check
         run: npm run typecheck
       - name: Build

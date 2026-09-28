@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { navigationItems } from "@/lib/navigation";
+import { UserMenu } from "@/components/auth/user-menu";
 
-export function MobileNavigation() {
+export function MobileNavigation({ email }: { email: string | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -120,6 +121,9 @@ export function MobileNavigation() {
                 })}
               </ul>
             </nav>
+            <div className="mt-auto pt-8">
+              <UserMenu compact email={email} />
+            </div>
           </div>
         </div>
       ) : null}

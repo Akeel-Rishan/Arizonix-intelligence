@@ -51,7 +51,7 @@ Set-Location apps/web
 npm run dev
 ```
 
-The default URLs are `http://127.0.0.1:3000` for the dashboard and `http://127.0.0.1:8000/api/v1/health` for API liveness.
+The default URLs are `http://127.0.0.1:3000` for the dashboard and `http://127.0.0.1:8000/api/v1/health` for API liveness. Replace the Supabase placeholders and complete the dashboard configuration described in [configuration.md](configuration.md) before using sign-up or sign-in.
 
 ## Command matrix
 
@@ -68,6 +68,7 @@ The default URLs are `http://127.0.0.1:3000` for the dashboard and `http://127.0
 | Frontend | Formatting check    | `npm run format:check`                     | `apps/web`        |
 | Frontend | Apply formatting    | `npm run format`                           | `apps/web`        |
 | Frontend | Configuration tests | `npm run test:config`                      | `apps/web`        |
+| Frontend | Auth helper tests   | `npm run test:auth`                        | `apps/web`        |
 | Frontend | Type-check          | `npm run typecheck`                        | `apps/web`        |
 | Frontend | Production build    | `npm run build`                            | `apps/web`        |
 | Browser  | Mocked smoke suite  | `npm run test:e2e`                         | `apps/web`        |
@@ -81,7 +82,7 @@ change, then inspect the generated schema diff.
 
 ## Browser integration
 
-The normal Playwright suite starts Next.js on port 3100 and keeps its valid, malformed, unavailable, retry, navigation, and responsive checks isolated with browser request interception.
+The normal Playwright suite starts Next.js on port 3100 and a deterministic test-only Supabase-compatible auth server on port 54321. It exercises real `@supabase/ssr` cookie behavior, successful and failed login, sign-up pending state, confirmation, sign-out, protection, safe redirects, navigation, API boundary states, and responsive layouts. It does not use a production auth bypass or external network access.
 
 To run the real API restart and recovery test in PowerShell:
 
@@ -133,6 +134,8 @@ Container hot reload is intentionally not configured. Source edits require rebui
 - Dashboard reports the API is unavailable: open the health URL directly, verify the API process is running, and confirm `NEXT_PUBLIC_API_BASE_URL` is a host-reachable origin.
 - CORS error: the browser page origin must exactly match an entry in `ARIZONIX_ALLOWED_ORIGINS`, including scheme, hostname, and port.
 - Configuration error in the health card: set `NEXT_PUBLIC_API_BASE_URL` to an `http://` or `https://` origin without `/api/v1`, credentials, query parameters, or fragments, then restart development or rebuild the web image.
+- Authentication setup screen: set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and the matching server-side `ARIZONIX_SUPABASE_URL`, then restart both applications.
+- Confirmation returns to sign-in: verify the dashboard Site URL, redirect allowlist, confirmation template, and exact host (`127.0.0.1` versus `localhost`) match the configured `NEXT_PUBLIC_SITE_URL`.
 - Docker build cannot download packages or images: verify Docker Desktop or the Docker daemon has network access, then retry `docker compose build --no-cache`.
 - Browser binary missing: run `npx playwright install chromium` locally or `npx playwright install --with-deps chromium` on Linux CI.
 - Occupied Playwright port 3100: stop the unrelated process. CI disables server reuse so it cannot accidentally test another application.

@@ -1,12 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-const healthUrl = "http://127.0.0.1:8000/api/v1/health";
+import { signIn } from "./support/auth";
+
+const healthUrl = "http://127.0.0.1:8011/api/v1/health";
 
 test("shell renders and every navigation destination resolves", async ({ page }) => {
   await page.route(healthUrl, (route) =>
     route.fulfill({ json: { status: "ok", service: "arizonix-api", version: "0.1.0" } }),
   );
-  await page.goto("/");
+  await signIn(page);
   await expect(page.getByRole("heading", { name: "Research overview" })).toBeVisible();
 
   const destinations = [
@@ -29,7 +31,7 @@ test("health card accepts only the expected contract", async ({ page }) => {
   await page.route(healthUrl, (route) =>
     route.fulfill({ json: { status: "ok", service: "arizonix-api", version: "0.1.0" } }),
   );
-  await page.goto("/");
+  await signIn(page);
   await expect(page.getByTestId("health-success")).toContainText("Connected to arizonix-api");
 
   await page.unroute(healthUrl);
@@ -47,7 +49,7 @@ test("unavailable API shows an error and retry recovers", async ({ page }) => {
     if (attempt === 1) return route.abort("connectionrefused");
     return route.fulfill({ json: { status: "ok", service: "arizonix-api", version: "0.1.0" } });
   });
-  await page.goto("/");
+  await signIn(page);
   await expect(page.getByTestId("health-error")).toContainText("could not be reached");
   await page.getByRole("button", { name: "Retry connection" }).click();
   await expect(page.getByTestId("health-success")).toBeVisible();
@@ -57,7 +59,7 @@ test("unavailable API shows an error and retry recovers", async ({ page }) => {
 test("mobile navigation is keyboard usable and layout does not overflow", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.route(healthUrl, (route) => route.abort("connectionrefused"));
-  await page.goto("/");
+  await signIn(page);
   await expect
     .poll(() =>
       page.evaluate(
@@ -83,6 +85,8 @@ test("responsive shell has no page overflow at target widths", async ({ page }, 
   await page.route(healthUrl, (route) =>
     route.fulfill({ json: { status: "ok", service: "arizonix-api", version: "0.1.0" } }),
   );
+
+  await signIn(page);
 
   for (const width of [375, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });

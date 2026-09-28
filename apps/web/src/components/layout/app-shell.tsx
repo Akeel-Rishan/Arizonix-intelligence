@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { MobileNavigation } from "@/components/layout/mobile-navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, email }: { children: ReactNode; email: string | null }) {
   return (
     <div className="min-h-[100dvh] bg-slate-50 lg:flex">
       <a
@@ -12,9 +12,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <Sidebar />
+      <Sidebar email={email} />
       <div className="min-w-0 flex-1">
-        <MobileNavigation />
+        <MobileNavigation email={email} />
         <main
           id="main-content"
           tabIndex={-1}

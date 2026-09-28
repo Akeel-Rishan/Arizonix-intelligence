@@ -11,7 +11,6 @@ export default function OverviewPage() {
         title="Research overview"
         description="Investigate one business carefully, keep conclusions tied to evidence, and preserve uncertainty for human review."
       />
-
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)]">
         <EmptyState
           title="No prospects have been added"
@@ -27,11 +26,10 @@ export default function OverviewPage() {
         />
         <ApiHealthCard />
       </div>
-
       <aside className="mt-6 rounded-2xl border border-slate-200 bg-slate-100 px-5 py-4 text-sm leading-6 text-slate-700">
-        <strong className="font-semibold text-slate-950">Local development foundation</strong>
+        <strong className="font-semibold text-slate-950">Authenticated foundation</strong>
         <span aria-hidden="true"> — </span>
-        authentication is not configured.
+        business records and research workflows arrive in later steps.
       </aside>
     </div>
   );

@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { navigationItems } from "@/lib/navigation";
+import { UserMenu } from "@/components/auth/user-menu";
 
 function isActiveRoute(pathname: string, href: string): boolean {
   return href === "/" ? pathname === href : pathname.startsWith(href);
 }
 
-export function Sidebar() {
+export function Sidebar({ email }: { email: string | null }) {
   const pathname = usePathname();
 
   return (
@@ -48,7 +49,7 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
-      <p className="mt-auto px-3 pt-8 text-xs leading-5 text-slate-500">Local foundation</p>
+      <UserMenu email={email} />
     </aside>
   );
 }
