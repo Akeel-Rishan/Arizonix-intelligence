@@ -38,6 +38,8 @@ jobs:
         run: uv run ruff format --check .
       - name: Test
         run: uv run pytest
+      - name: Validate synthetic evaluation fixtures
+        run: uv run python -m arizonix_api.evaluation
 
   frontend-quality:
     name: Frontend quality

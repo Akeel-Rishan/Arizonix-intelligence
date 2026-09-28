@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-008",
+  "description": "A recent documented fix contradicts older booking complaints.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "80000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Fern & Finch Salon",
+      "website_url": "https://fern-finch.example",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "sources": [
+      {
+        "id": "80000000-0000-4000-8000-000000000201",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "kind": "review_platform",
+        "canonical_url": "https://reviews.example/fern-finch/old",
+        "created_at": "2026-05-01T09:01:00Z"
+      },
+      {
+        "id": "80000000-0000-4000-8000-000000000202",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "kind": "official_website",
+        "canonical_url": "https://fern-finch.example/updates/booking-fix",
+        "created_at": "2026-05-01T09:01:00Z"
+      }
+    ],
+    "snapshots": [
+      {
+        "id": "80000000-0000-4000-8000-000000000301",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "source_id": "80000000-0000-4000-8000-000000000201",
+        "requested_url": "https://reviews.example/fern-finch/old",
+        "final_url": "https://reviews.example/fern-finch/old",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:00:00Z",
+        "content_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "storage_reference": "snapshot://eval-008/old-complaint",
+        "publication_precision": "exact_date",
+        "publication_date": "2024-03-01"
+      },
+      {
+        "id": "80000000-0000-4000-8000-000000000302",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "source_id": "80000000-0000-4000-8000-000000000202",
+        "requested_url": "https://fern-finch.example/updates/booking-fix",
+        "final_url": "https://fern-finch.example/updates/booking-fix",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-28T10:00:00Z",
+        "content_sha256": "8989898989898989898989898989898989898989898989898989898989898989",
+        "storage_reference": "snapshot://eval-008/recent-fix",
+        "publication_precision": "exact_date",
+        "publication_date": "2026-05-15"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "80000000-0000-4000-8000-000000000401",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "display_label": "EV-001",
+        "source_snapshot_id": "80000000-0000-4000-8000-000000000301",
+        "evidence_type": "attributed_statement",
+        "observation": "A 2024 reviewer reported booking difficulty.",
+        "freshness": "historical",
+        "strength": "weak"
+      },
+      {
+        "id": "80000000-0000-4000-8000-000000000402",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "display_label": "EV-002",
+        "source_snapshot_id": "80000000-0000-4000-8000-000000000302",
+        "evidence_type": "direct_observation",
+        "observation": "The official site says the booking defect was fixed in May 2026.",
+        "freshness": "recent",
+        "strength": "moderate"
+      }
+    ],
+    "claims": [{
+      "id": "80000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "80000000-0000-4000-8000-000000000101",
+      "statement": "The booking problem remains current.",
+      "version": 1,
+      "lifecycle_status": "under_review",
+      "evidentiary_classification": "signal",
+      "confidence": 0.35
+    }],
+    "claim_evidence_relationships": [
+      {
+        "id": "80000000-0000-4000-8000-000000000601",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "claim_id": "80000000-0000-4000-8000-000000000501",
+        "claim_version": 1,
+        "evidence_id": "80000000-0000-4000-8000-000000000401",
+        "relationship": "support"
+      },
+      {
+        "id": "80000000-0000-4000-8000-000000000602",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "80000000-0000-4000-8000-000000000101",
+        "claim_id": "80000000-0000-4000-8000-000000000501",
+        "claim_version": 1,
+        "evidence_id": "80000000-0000-4000-8000-000000000402",
+        "relationship": "contradiction"
+      }
+    ]
+  },
+  "expected_research_outcome": "insufficient_evidence",
+  "expected_claim_constraints": [{
+    "claim_id": "80000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["signal", "historical"],
+    "forbidden_lifecycle_statuses": ["verified"],
+    "maximum_confidence": 0.5,
+    "requirement": "Account for the recent contradictory fix and seek current independent verification."
+  }],
+  "required_behaviors": ["Preserve both support and contradiction links."],
+  "forbidden_conclusions": ["The older complaints prove the defect still exists."],
+  "rationale": "A claimed fix changes the current hypothesis but does not by itself prove resolution."
+}

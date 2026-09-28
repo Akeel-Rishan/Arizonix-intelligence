@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-009",
+  "description": "A recently captured article has no known publication date.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "90000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Lumen Tutors",
+      "website_url": "https://lumen-tutors.example",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "sources": [{
+      "id": "90000000-0000-4000-8000-000000000201",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "90000000-0000-4000-8000-000000000101",
+      "kind": "news",
+      "canonical_url": "https://news.example/lumen-profile",
+      "created_at": "2026-05-01T09:01:00Z"
+    }],
+    "snapshots": [{
+      "id": "90000000-0000-4000-8000-000000000301",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "90000000-0000-4000-8000-000000000101",
+      "source_id": "90000000-0000-4000-8000-000000000201",
+      "requested_url": "https://news.example/lumen-profile",
+      "final_url": "https://news.example/lumen-profile",
+      "capture_status": "success",
+      "http_status": 200,
+      "captured_at": "2026-05-30T10:00:00Z",
+      "content_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "storage_reference": "snapshot://eval-009/undated-article",
+      "publication_precision": "unknown"
+    }],
+    "evidence": [{
+      "id": "90000000-0000-4000-8000-000000000401",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "90000000-0000-4000-8000-000000000101",
+      "display_label": "EV-001",
+      "source_snapshot_id": "90000000-0000-4000-8000-000000000301",
+      "evidence_type": "attributed_statement",
+      "observation": "The undated article describes a tutoring service.",
+      "freshness": "unknown"
+    }],
+    "claims": [{
+      "id": "90000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "90000000-0000-4000-8000-000000000101",
+      "statement": "The article describes a tutoring service, but its publication date is unknown.",
+      "version": 1,
+      "lifecycle_status": "draft",
+      "evidentiary_classification": "signal"
+    }],
+    "claim_evidence_relationships": [{
+      "id": "90000000-0000-4000-8000-000000000601",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "90000000-0000-4000-8000-000000000101",
+      "claim_id": "90000000-0000-4000-8000-000000000501",
+      "claim_version": 1,
+      "evidence_id": "90000000-0000-4000-8000-000000000401",
+      "relationship": "support"
+    }]
+  },
+  "expected_research_outcome": "insufficient_evidence",
+  "expected_claim_constraints": [{
+    "claim_id": "90000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["signal", "historical", "stale"],
+    "forbidden_lifecycle_statuses": ["verified"],
+    "requirement": "Keep publication time and freshness unknown until separately established."
+  }],
+  "required_behaviors": ["Preserve the unknown publication precision after a recent capture."],
+  "forbidden_conclusions": ["The article was recently published."],
+  "rationale": "captured_at records collection time and cannot substitute for publication time."
+}

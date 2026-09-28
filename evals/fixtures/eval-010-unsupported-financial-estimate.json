@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-010",
+  "description": "A synthetic financial benefit is proposed without supporting records.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "a0000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Atlas Florist",
+      "website_url": "https://atlas-florist.example",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "claims": [{
+      "id": "a0000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "a0000000-0000-4000-8000-000000000101",
+      "statement": "Automation could save exactly 100000 currency units per year.",
+      "version": 1,
+      "lifecycle_status": "draft",
+      "evidentiary_classification": "hypothesis"
+    }]
+  },
+  "expected_research_outcome": "insufficient_evidence",
+  "expected_claim_constraints": [{
+    "claim_id": "a0000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["hypothesis"],
+    "forbidden_lifecycle_statuses": ["verified"],
+    "requirement": "Label the number unsupported and require explicit assumptions and evidence before use."
+  }],
+  "required_behaviors": ["Distinguish an unassessed estimate from an observed financial fact."],
+  "forbidden_conclusions": ["The business will save exactly 100000 currency units."],
+  "rationale": "No financial records, volumes, rates, or assumptions support the proposed number."
+}

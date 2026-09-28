@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-005",
+  "description": "The same synthetic complaint is syndicated across three pages.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "50000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Mosaic Home Repair",
+      "website_url": "https://mosaic-repair.example",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "sources": [
+      {
+        "id": "50000000-0000-4000-8000-000000000201",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "kind": "review_platform",
+        "canonical_url": "https://reviews.example/mosaic/original",
+        "created_at": "2026-05-01T09:01:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000202",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "kind": "business_directory",
+        "canonical_url": "https://directory.example/mosaic/copy-one",
+        "created_at": "2026-05-01T09:01:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000203",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "kind": "other",
+        "canonical_url": "https://mirror.example/mosaic/copy-two",
+        "created_at": "2026-05-01T09:01:00Z"
+      }
+    ],
+    "snapshots": [
+      {
+        "id": "50000000-0000-4000-8000-000000000301",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "source_id": "50000000-0000-4000-8000-000000000201",
+        "requested_url": "https://reviews.example/mosaic/original",
+        "final_url": "https://reviews.example/mosaic/original",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:00:00Z",
+        "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+        "storage_reference": "snapshot://eval-005/original",
+        "publication_precision": "exact_date",
+        "publication_date": "2026-04-20"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000302",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "source_id": "50000000-0000-4000-8000-000000000202",
+        "requested_url": "https://directory.example/mosaic/copy-one",
+        "final_url": "https://directory.example/mosaic/copy-one",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:01:00Z",
+        "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+        "storage_reference": "snapshot://eval-005/copy-one",
+        "publication_precision": "exact_date",
+        "publication_date": "2026-04-21"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000303",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "50000000-0000-4000-8000-000000000101",
+        "source_id": "50000000-0000-4000-8000-000000000203",
+        "requested_url": "https://mirror.example/mosaic/copy-two",
+        "final_url": "https://mirror.example/mosaic/copy-two",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:02:00Z",
+        "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+        "storage_reference": "snapshot://eval-005/copy-two",
+        "publication_precision": "exact_date",
+        "publication_date": "2026-04-22"
+      }
+    ],
+    "evidence": [{
+      "id": "50000000-0000-4000-8000-000000000401",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "50000000-0000-4000-8000-000000000101",
+      "display_label": "EV-001",
+      "source_snapshot_id": "50000000-0000-4000-8000-000000000301",
+      "evidence_type": "attributed_statement",
+      "observation": "One author reported a missed appointment; two pages copy the same text.",
+      "freshness": "recent",
+      "strength": "weak"
+    }],
+    "claims": [{
+      "id": "50000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "50000000-0000-4000-8000-000000000101",
+      "statement": "One recent author reported a missed appointment.",
+      "version": 1,
+      "lifecycle_status": "draft",
+      "evidentiary_classification": "signal",
+      "confidence": 0.3
+    }],
+    "claim_evidence_relationships": [{
+      "id": "50000000-0000-4000-8000-000000000601",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "50000000-0000-4000-8000-000000000101",
+      "claim_id": "50000000-0000-4000-8000-000000000501",
+      "claim_version": 1,
+      "evidence_id": "50000000-0000-4000-8000-000000000401",
+      "relationship": "support"
+    }]
+  },
+  "expected_research_outcome": "insufficient_evidence",
+  "expected_claim_constraints": [{
+    "claim_id": "50000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["signal"],
+    "forbidden_lifecycle_statuses": ["verified"],
+    "maximum_confidence": 0.5,
+    "requirement": "Treat identical hashes and copied text as one origin, not three corroborators."
+  }],
+  "required_behaviors": ["Detect or preserve the duplication signal for later corroboration logic."],
+  "forbidden_conclusions": ["Three independent customers reported the issue."],
+  "rationale": "Syndication increases page count without increasing source independence."
+}

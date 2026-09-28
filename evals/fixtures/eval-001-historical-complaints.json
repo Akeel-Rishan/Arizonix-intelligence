@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-001",
+  "description": "Two synthetic complaints published in 2019 are assessed in 2026.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "10000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Cedar Lane Dental",
+      "location_label": "Exampleton",
+      "website_url": "https://cedar-lane.example",
+      "identity_key": "cedar-lane-dental-exampleton",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "sources": [{
+      "id": "10000000-0000-4000-8000-000000000201",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "10000000-0000-4000-8000-000000000101",
+      "kind": "review_platform",
+      "canonical_url": "https://reviews.example/cedar-lane",
+      "title": "Synthetic review archive",
+      "identity_fingerprint": "reviews-example-cedar-lane",
+      "created_at": "2026-05-01T09:01:00Z"
+    }],
+    "snapshots": [
+      {
+        "id": "10000000-0000-4000-8000-000000000301",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "source_id": "10000000-0000-4000-8000-000000000201",
+        "requested_url": "https://reviews.example/cedar-lane/complaint-a",
+        "final_url": "https://reviews.example/cedar-lane/complaint-a",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:00:00Z",
+        "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "storage_reference": "snapshot://eval-001/complaint-a",
+        "publication_precision": "exact_date",
+        "publication_date": "2019-02-10"
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000302",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "source_id": "10000000-0000-4000-8000-000000000201",
+        "requested_url": "https://reviews.example/cedar-lane/complaint-b",
+        "final_url": "https://reviews.example/cedar-lane/complaint-b",
+        "capture_status": "success",
+        "http_status": 200,
+        "captured_at": "2026-05-20T10:01:00Z",
+        "content_sha256": "1212121212121212121212121212121212121212121212121212121212121212",
+        "storage_reference": "snapshot://eval-001/complaint-b",
+        "publication_precision": "exact_date",
+        "publication_date": "2019-08-14"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "10000000-0000-4000-8000-000000000401",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "display_label": "EV-001",
+        "source_snapshot_id": "10000000-0000-4000-8000-000000000301",
+        "evidence_type": "attributed_statement",
+        "observation": "A 2019 reviewer reported difficulty booking an appointment.",
+        "freshness": "historical",
+        "strength": "weak"
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000402",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "display_label": "EV-002",
+        "source_snapshot_id": "10000000-0000-4000-8000-000000000302",
+        "evidence_type": "attributed_statement",
+        "observation": "A second 2019 reviewer reported a delayed response.",
+        "freshness": "historical",
+        "strength": "weak"
+      }
+    ],
+    "claims": [{
+      "id": "10000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "10000000-0000-4000-8000-000000000101",
+      "statement": "The business had booking complaints in 2019.",
+      "version": 1,
+      "lifecycle_status": "under_review",
+      "evidentiary_classification": "historical",
+      "confidence": 0.8
+    }],
+    "claim_evidence_relationships": [
+      {
+        "id": "10000000-0000-4000-8000-000000000601",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "claim_id": "10000000-0000-4000-8000-000000000501",
+        "claim_version": 1,
+        "evidence_id": "10000000-0000-4000-8000-000000000401",
+        "relationship": "support"
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000602",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "10000000-0000-4000-8000-000000000101",
+        "claim_id": "10000000-0000-4000-8000-000000000501",
+        "claim_version": 1,
+        "evidence_id": "10000000-0000-4000-8000-000000000402",
+        "relationship": "support"
+      }
+    ]
+  },
+  "expected_research_outcome": "stale_data",
+  "expected_claim_constraints": [{
+    "claim_id": "10000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["historical", "stale"],
+    "forbidden_lifecycle_statuses": ["verified"],
+    "requirement": "Historical complaints may describe 2019 but cannot establish a current systemic problem."
+  }],
+  "required_behaviors": ["Preserve both publication dates and seek current evidence."],
+  "forbidden_conclusions": ["The company currently has a booking problem."],
+  "rationale": "Capture in 2026 does not refresh content published in 2019."
+}

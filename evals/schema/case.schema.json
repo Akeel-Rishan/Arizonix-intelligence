@@ -1,0 +1,1181 @@
+{
+  "$defs": {
+    "CaptureStatus": {
+      "enum": [
+        "success",
+        "inaccessible",
+        "failed"
+      ],
+      "title": "CaptureStatus",
+      "type": "string"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "evidentiary_classification": {
+          "$ref": "#/$defs/EvidentiaryClassification"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "lifecycle_status": {
+          "$ref": "#/$defs/ClaimLifecycleStatus"
+        },
+        "research_run_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Research Run Id"
+        },
+        "statement": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "statement",
+        "version",
+        "lifecycle_status",
+        "evidentiary_classification"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimEvidenceRelationship": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "format": "uuid",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_version": {
+          "minimum": 1,
+          "title": "Claim Version",
+          "type": "integer"
+        },
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "relationship": {
+          "$ref": "#/$defs/EvidenceRelationshipKind"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "claim_id",
+        "claim_version",
+        "evidence_id",
+        "relationship"
+      ],
+      "title": "ClaimEvidenceRelationship",
+      "type": "object"
+    },
+    "ClaimLifecycleStatus": {
+      "enum": [
+        "draft",
+        "under_review",
+        "verified",
+        "rejected",
+        "invalidated"
+      ],
+      "title": "ClaimLifecycleStatus",
+      "type": "string"
+    },
+    "Company": {
+      "additionalProperties": false,
+      "description": "A workspace-scoped business identity, not an authorization decision.",
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "identity_key": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identity Key"
+        },
+        "location_label": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location Label"
+        },
+        "name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "website_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Website Url"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "name",
+        "created_at"
+      ],
+      "title": "Company",
+      "type": "object"
+    },
+    "DomainBundle": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_evidence_relationships": {
+          "items": {
+            "$ref": "#/$defs/ClaimEvidenceRelationship"
+          },
+          "title": "Claim Evidence Relationships",
+          "type": "array"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Claims",
+          "type": "array"
+        },
+        "companies": {
+          "items": {
+            "$ref": "#/$defs/Company"
+          },
+          "title": "Companies",
+          "type": "array"
+        },
+        "contract_version": {
+          "const": "1.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "research_projects": {
+          "items": {
+            "$ref": "#/$defs/ResearchProject"
+          },
+          "title": "Research Projects",
+          "type": "array"
+        },
+        "research_runs": {
+          "items": {
+            "$ref": "#/$defs/ResearchRun"
+          },
+          "title": "Research Runs",
+          "type": "array"
+        },
+        "review_decisions": {
+          "items": {
+            "$ref": "#/$defs/HumanReviewDecision"
+          },
+          "title": "Review Decisions",
+          "type": "array"
+        },
+        "snapshots": {
+          "items": {
+            "$ref": "#/$defs/SourceSnapshot"
+          },
+          "title": "Snapshots",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_version"
+      ],
+      "title": "DomainBundle",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "display_label": {
+          "pattern": "^EV-[0-9]{3,}$",
+          "title": "Display Label",
+          "type": "string"
+        },
+        "evidence_type": {
+          "$ref": "#/$defs/EvidenceType"
+        },
+        "excerpt_locator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExactExcerptLocator"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "freshness": {
+          "$ref": "#/$defs/Freshness",
+          "default": "unknown"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "observation": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "title": "Observation",
+          "type": "string"
+        },
+        "source_reliability": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Reliability"
+        },
+        "source_snapshot_id": {
+          "format": "uuid",
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "strength": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceStrength"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "display_label",
+        "source_snapshot_id",
+        "evidence_type",
+        "observation"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceRelationshipKind": {
+      "enum": [
+        "support",
+        "contradiction",
+        "ambiguous"
+      ],
+      "title": "EvidenceRelationshipKind",
+      "type": "string"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "weak",
+        "moderate",
+        "strong"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    },
+    "EvidenceType": {
+      "enum": [
+        "direct_observation",
+        "exact_excerpt",
+        "structured_record",
+        "attributed_statement"
+      ],
+      "title": "EvidenceType",
+      "type": "string"
+    },
+    "EvidentiaryClassification": {
+      "enum": [
+        "fact",
+        "signal",
+        "inference",
+        "hypothesis",
+        "historical",
+        "stale",
+        "invalid"
+      ],
+      "title": "EvidentiaryClassification",
+      "type": "string"
+    },
+    "ExactExcerptLocator": {
+      "additionalProperties": false,
+      "properties": {
+        "end_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Offset"
+        },
+        "excerpt": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "selector": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selector"
+        },
+        "start_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Offset"
+        }
+      },
+      "required": [
+        "excerpt"
+      ],
+      "title": "ExactExcerptLocator",
+      "type": "object"
+    },
+    "ExpectedClaimConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_classifications": {
+          "items": {
+            "$ref": "#/$defs/EvidentiaryClassification"
+          },
+          "title": "Allowed Classifications",
+          "type": "array"
+        },
+        "claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Claim Id"
+        },
+        "forbidden_lifecycle_statuses": {
+          "items": {
+            "$ref": "#/$defs/ClaimLifecycleStatus"
+          },
+          "title": "Forbidden Lifecycle Statuses",
+          "type": "array"
+        },
+        "maximum_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Confidence"
+        },
+        "requirement": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Requirement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement"
+      ],
+      "title": "ExpectedClaimConstraint",
+      "type": "object"
+    },
+    "Freshness": {
+      "enum": [
+        "unknown",
+        "current",
+        "recent",
+        "historical",
+        "stale"
+      ],
+      "title": "Freshness",
+      "type": "string"
+    },
+    "HumanReviewDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "format": "uuid",
+          "title": "Actor Id",
+          "type": "string"
+        },
+        "artifact_id": {
+          "format": "uuid",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_type": {
+          "$ref": "#/$defs/ReviewArtifactType"
+        },
+        "artifact_version": {
+          "minimum": 1,
+          "title": "Artifact Version",
+          "type": "integer"
+        },
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decision": {
+          "$ref": "#/$defs/ReviewDecision"
+        },
+        "explanation": {
+          "anyOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explanation"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "review_scope": {
+          "$ref": "#/$defs/ReviewScope"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "review_scope",
+        "artifact_type",
+        "artifact_id",
+        "artifact_version",
+        "actor_id",
+        "decision",
+        "decided_at"
+      ],
+      "title": "HumanReviewDecision",
+      "type": "object"
+    },
+    "ProjectProgression": {
+      "enum": [
+        "draft",
+        "ready",
+        "active",
+        "completed",
+        "closed"
+      ],
+      "title": "ProjectProgression",
+      "type": "string"
+    },
+    "PublicationPrecision": {
+      "enum": [
+        "unknown",
+        "exact_timestamp",
+        "exact_date",
+        "approximate_period"
+      ],
+      "title": "PublicationPrecision",
+      "type": "string"
+    },
+    "ResearchOutcome": {
+      "enum": [
+        "insufficient_evidence",
+        "no_meaningful_problem",
+        "unsuitable_business",
+        "stale_data",
+        "opportunity_candidate",
+        "human_rejected"
+      ],
+      "title": "ResearchOutcome",
+      "type": "string"
+    },
+    "ResearchProject": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "objective": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Objective",
+          "type": "string"
+        },
+        "progression": {
+          "$ref": "#/$defs/ProjectProgression"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "objective",
+        "version",
+        "progression",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "ResearchProject",
+      "type": "object"
+    },
+    "ResearchRun": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed At"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "project_id": {
+          "format": "uuid",
+          "title": "Project Id",
+          "type": "string"
+        },
+        "queued_at": {
+          "format": "date-time",
+          "title": "Queued At",
+          "type": "string"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "project_id",
+        "status",
+        "queued_at"
+      ],
+      "title": "ResearchRun",
+      "type": "object"
+    },
+    "ReviewArtifactType": {
+      "enum": [
+        "research_project",
+        "research_run",
+        "claim",
+        "outbound_message"
+      ],
+      "title": "ReviewArtifactType",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "enum": [
+        "approved",
+        "rejected",
+        "changes_requested"
+      ],
+      "title": "ReviewDecision",
+      "type": "string"
+    },
+    "ReviewScope": {
+      "enum": [
+        "research",
+        "outbound_message"
+      ],
+      "title": "ReviewScope",
+      "type": "string"
+    },
+    "RunStatus": {
+      "enum": [
+        "queued",
+        "running",
+        "paused",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Canonical Url",
+          "type": "string"
+        },
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "identity_fingerprint": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identity Fingerprint"
+        },
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "kind",
+        "canonical_url",
+        "created_at"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "SourceKind": {
+      "enum": [
+        "official_website",
+        "review_platform",
+        "news",
+        "social",
+        "business_directory",
+        "other"
+      ],
+      "title": "SourceKind",
+      "type": "string"
+    },
+    "SourceSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_status": {
+          "$ref": "#/$defs/CaptureStatus"
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "company_id": {
+          "format": "uuid",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "content_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Sha256"
+        },
+        "final_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Final Url"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Http Status"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "publication_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Date"
+        },
+        "publication_period": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Period"
+        },
+        "publication_precision": {
+          "$ref": "#/$defs/PublicationPrecision",
+          "default": "unknown"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "requested_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Requested Url",
+          "type": "string"
+        },
+        "source_id": {
+          "format": "uuid",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "storage_reference": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Storage Reference"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "company_id",
+        "source_id",
+        "requested_url",
+        "capture_status",
+        "captured_at"
+      ],
+      "title": "SourceSnapshot",
+      "type": "object"
+    }
+  },
+  "$id": "https://arizonix.example/schemas/evaluation-case-1.0.json",
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "case_id": {
+      "pattern": "^EVAL-[0-9]{3}$",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "expected_claim_constraints": {
+      "items": {
+        "$ref": "#/$defs/ExpectedClaimConstraint"
+      },
+      "minItems": 1,
+      "title": "Expected Claim Constraints",
+      "type": "array"
+    },
+    "expected_research_outcome": {
+      "$ref": "#/$defs/ResearchOutcome"
+    },
+    "forbidden_conclusions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Forbidden Conclusions",
+      "type": "array"
+    },
+    "inputs": {
+      "$ref": "#/$defs/DomainBundle"
+    },
+    "rationale": {
+      "maxLength": 5000,
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "required_behaviors": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Behaviors",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "synthetic": {
+      "const": true,
+      "title": "Synthetic",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "contract_version",
+    "case_id",
+    "description",
+    "as_of",
+    "synthetic",
+    "inputs",
+    "expected_research_outcome",
+    "expected_claim_constraints",
+    "required_behaviors",
+    "forbidden_conclusions",
+    "rationale"
+  ],
+  "title": "EvaluationCase",
+  "type": "object"
+}

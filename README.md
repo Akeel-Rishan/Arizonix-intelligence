@@ -1,6 +1,6 @@
 # Arizonix Intelligence
 
-Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides a reproducible local foundation: a FastAPI liveness API, a responsive Next.js dashboard shell, typed configuration, automated quality checks, optional containers, and CI definitions.
+Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides a reproducible local foundation: a FastAPI liveness API, a responsive Next.js dashboard shell, typed configuration, versioned domain contracts, synthetic evaluation fixtures, automated quality checks, optional containers, and CI definitions.
 
 It does not yet include authentication, databases, agents, scraping, outreach, external providers, deployment, or production security controls.
 
@@ -59,6 +59,7 @@ uv sync --frozen
 uv run ruff check .
 uv run ruff format --check .
 uv run pytest
+uv run python -m arizonix_api.evaluation
 ```
 
 Frontend, from `apps/web`:
@@ -74,5 +75,10 @@ npm run test:e2e
 ```
 
 The opt-in real-process browser check is documented in [development.md](docs/development.md). Configuration ownership and precedence are documented in [configuration.md](docs/configuration.md).
+
+Core semantics and decisions are documented in [domain-model.md](docs/domain-model.md) and the
+[ADR index](docs/adr/README.md). The provisional roadmap mapping is in
+[requirements-coverage.md](docs/requirements-coverage.md). Evaluation fixtures and the important limit
+of structural validation are described in [evals/README.md](evals/README.md).
 
 Authentication and production security are not implemented. Do not treat this foundation or its Compose workflow as production-ready.

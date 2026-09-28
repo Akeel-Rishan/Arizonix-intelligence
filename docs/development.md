@@ -55,23 +55,29 @@ The default URLs are `http://127.0.0.1:3000` for the dashboard and `http://127.0
 
 ## Command matrix
 
-| Area     | Purpose             | Command                        | Working directory |
-| -------- | ------------------- | ------------------------------ | ----------------- |
-| Backend  | Frozen install      | `uv sync --frozen`             | `apps/api`        |
-| Backend  | Lint                | `uv run ruff check .`          | `apps/api`        |
-| Backend  | Formatting check    | `uv run ruff format --check .` | `apps/api`        |
-| Backend  | Apply formatting    | `uv run ruff format .`         | `apps/api`        |
-| Backend  | Tests               | `uv run pytest`                | `apps/api`        |
-| Frontend | Frozen install      | `npm ci`                       | `apps/web`        |
-| Frontend | Lint                | `npm run lint`                 | `apps/web`        |
-| Frontend | Formatting check    | `npm run format:check`         | `apps/web`        |
-| Frontend | Apply formatting    | `npm run format`               | `apps/web`        |
-| Frontend | Configuration tests | `npm run test:config`          | `apps/web`        |
-| Frontend | Type-check          | `npm run typecheck`            | `apps/web`        |
-| Frontend | Production build    | `npm run build`                | `apps/web`        |
-| Browser  | Mocked smoke suite  | `npm run test:e2e`             | `apps/web`        |
+| Area     | Purpose             | Command                                    | Working directory |
+| -------- | ------------------- | ------------------------------------------ | ----------------- |
+| Backend  | Frozen install      | `uv sync --frozen`                         | `apps/api`        |
+| Backend  | Lint                | `uv run ruff check .`                      | `apps/api`        |
+| Backend  | Formatting check    | `uv run ruff format --check .`             | `apps/api`        |
+| Backend  | Apply formatting    | `uv run ruff format .`                     | `apps/api`        |
+| Backend  | Tests               | `uv run pytest`                            | `apps/api`        |
+| Backend  | Fixture validation  | `uv run python -m arizonix_api.evaluation` | `apps/api`        |
+| Frontend | Frozen install      | `npm ci`                                   | `apps/web`        |
+| Frontend | Lint                | `npm run lint`                             | `apps/web`        |
+| Frontend | Formatting check    | `npm run format:check`                     | `apps/web`        |
+| Frontend | Apply formatting    | `npm run format`                           | `apps/web`        |
+| Frontend | Configuration tests | `npm run test:config`                      | `apps/web`        |
+| Frontend | Type-check          | `npm run typecheck`                        | `apps/web`        |
+| Frontend | Production build    | `npm run build`                            | `apps/web`        |
+| Browser  | Mocked smoke suite  | `npm run test:e2e`                         | `apps/web`        |
 
 Quality-check commands do not modify source files. Only the explicit `format` commands write changes.
+
+Evaluation validation is deterministic and offline. It checks committed schema drift, fixture shape,
+contract versions, references, and ownership. It does not run a model or measure model behavior. Use
+`uv run python -m arizonix_api.evaluation --write-schema` only after an intentional evaluation-contract
+change, then inspect the generated schema diff.
 
 ## Browser integration
 

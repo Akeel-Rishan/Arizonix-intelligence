@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-004",
+  "description": "Two unrelated synthetic businesses share a name in different locations.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [
+      {
+        "id": "40000000-0000-4000-8000-000000000101",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "name": "Harbor Cafe",
+        "location_label": "North Example",
+        "website_url": "https://harbor-north.example",
+        "identity_key": "harbor-cafe-north-example",
+        "created_at": "2026-05-01T09:00:00Z"
+      },
+      {
+        "id": "40000000-0000-4000-8000-000000000102",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "name": "Harbor Cafe",
+        "location_label": "South Example",
+        "website_url": "https://harbor-south.example",
+        "identity_key": "harbor-cafe-south-example",
+        "created_at": "2026-05-01T09:00:00Z"
+      }
+    ],
+    "sources": [
+      {
+        "id": "40000000-0000-4000-8000-000000000201",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "40000000-0000-4000-8000-000000000101",
+        "kind": "official_website",
+        "canonical_url": "https://harbor-north.example",
+        "created_at": "2026-05-01T09:01:00Z"
+      },
+      {
+        "id": "40000000-0000-4000-8000-000000000202",
+        "workspace_id": "00000000-0000-4000-8000-000000000001",
+        "company_id": "40000000-0000-4000-8000-000000000102",
+        "kind": "official_website",
+        "canonical_url": "https://harbor-south.example",
+        "created_at": "2026-05-01T09:01:00Z"
+      }
+    ]
+  },
+  "expected_research_outcome": "insufficient_evidence",
+  "expected_claim_constraints": [{
+    "requirement": "Keep the two company IDs and all future evidence separated by location and identity key."
+  }],
+  "required_behaviors": ["Resolve identity before associating sources or claims."],
+  "forbidden_conclusions": ["The two Harbor Cafe records describe one company."],
+  "rationale": "A shared display name is not a durable identity key."
+}

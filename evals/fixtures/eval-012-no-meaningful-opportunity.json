@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "contract_version": "1.0",
+  "case_id": "EVAL-012",
+  "description": "Current synthetic evidence shows no meaningful service problem or opportunity.",
+  "as_of": "2026-06-01T00:00:00Z",
+  "synthetic": true,
+  "inputs": {
+    "contract_version": "1.0",
+    "companies": [{
+      "id": "c0000000-0000-4000-8000-000000000101",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "name": "Quartz Accounting",
+      "website_url": "https://quartz-accounting.example",
+      "created_at": "2026-05-01T09:00:00Z"
+    }],
+    "sources": [{
+      "id": "c0000000-0000-4000-8000-000000000201",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "c0000000-0000-4000-8000-000000000101",
+      "kind": "official_website",
+      "canonical_url": "https://quartz-accounting.example/contact",
+      "created_at": "2026-05-01T09:01:00Z"
+    }],
+    "snapshots": [{
+      "id": "c0000000-0000-4000-8000-000000000301",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "c0000000-0000-4000-8000-000000000101",
+      "source_id": "c0000000-0000-4000-8000-000000000201",
+      "requested_url": "https://quartz-accounting.example/contact",
+      "final_url": "https://quartz-accounting.example/contact/confirmed",
+      "capture_status": "success",
+      "http_status": 200,
+      "captured_at": "2026-05-30T10:00:00Z",
+      "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "storage_reference": "snapshot://eval-012/contact-confirmation",
+      "publication_precision": "unknown"
+    }],
+    "evidence": [{
+      "id": "c0000000-0000-4000-8000-000000000401",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "c0000000-0000-4000-8000-000000000101",
+      "display_label": "EV-001",
+      "source_snapshot_id": "c0000000-0000-4000-8000-000000000301",
+      "evidence_type": "direct_observation",
+      "observation": "The current contact flow completed and no material service failure was observed.",
+      "freshness": "current",
+      "strength": "strong"
+    }],
+    "claims": [{
+      "id": "c0000000-0000-4000-8000-000000000501",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "c0000000-0000-4000-8000-000000000101",
+      "statement": "The observed contact flow completed successfully.",
+      "version": 1,
+      "lifecycle_status": "verified",
+      "evidentiary_classification": "fact",
+      "confidence": 0.95
+    }],
+    "claim_evidence_relationships": [{
+      "id": "c0000000-0000-4000-8000-000000000601",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "company_id": "c0000000-0000-4000-8000-000000000101",
+      "claim_id": "c0000000-0000-4000-8000-000000000501",
+      "claim_version": 1,
+      "evidence_id": "c0000000-0000-4000-8000-000000000401",
+      "relationship": "support"
+    }]
+  },
+  "expected_research_outcome": "no_meaningful_problem",
+  "expected_claim_constraints": [{
+    "claim_id": "c0000000-0000-4000-8000-000000000501",
+    "allowed_classifications": ["fact"],
+    "requirement": "Do not manufacture a pain point when current evidence does not support one."
+  }],
+  "required_behaviors": ["Stop research without proposing outreach when no meaningful opportunity is found."],
+  "forbidden_conclusions": ["The business needs a fabricated automation solution."],
+  "rationale": "No meaningful problem is a valid terminal outcome and should not be overridden by outreach goals."
+}
