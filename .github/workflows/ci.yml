@@ -21,6 +21,24 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    env:
+      ARIZONIX_DATABASE_URL: postgresql+asyncpg://arizonix_runtime:ci-runtime-password@postgres:5432/arizonix_test
+      ARIZONIX_MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-password@postgres:5432/arizonix_test
+      ARIZONIX_RUNTIME_DATABASE_PASSWORD: ci-runtime-password
+      ARIZONIX_TEST_MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-password@postgres:5432/arizonix_test
+      ARIZONIX_TEST_RUNTIME_DATABASE_URL: postgresql+asyncpg://arizonix_runtime:ci-runtime-password@postgres:5432/arizonix_test
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: arizonix_test
+          POSTGRES_PASSWORD: ci-admin-password
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d arizonix_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -32,6 +50,10 @@ jobs:
           cache-dependency-glob: apps/api/uv.lock
       - name: Install locked dependencies
         run: uv sync --frozen
+      - name: Provision restricted roles and apply fresh migrations
+        run: |
+          uv run python scripts/bootstrap_database.py
+          uv run alembic upgrade head
       - name: Lint
         run: uv run ruff check .
       - name: Check formatting

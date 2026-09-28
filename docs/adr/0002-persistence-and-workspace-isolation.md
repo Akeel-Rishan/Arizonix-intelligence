@@ -1,6 +1,6 @@
 # ADR 0002: Persistence and workspace isolation
 
-- **Status:** Accepted; implementation planned
+- **Status:** Accepted; workspace foundation implemented
 - **Date:** 2026-09-28
 
 ## Context
@@ -11,7 +11,7 @@ replace explicit provenance links.
 
 ## Decision
 
-Plan PostgreSQL through Supabase for relational operational state, object storage for captured source
+Use PostgreSQL through Supabase for relational operational state, object storage for captured source
 material, and pgvector only where semantic retrieval is justified. Begin with relational IDs for
 source, snapshot, evidence, claim, contradiction, and review relationships.
 
@@ -32,8 +32,14 @@ with persistence work.
 Workspace identity is explicit in current contracts, but IDs and Pydantic validation do not authorize
 access. Future migrations need foreign keys, uniqueness rules, policy tests, and privileged-path tests.
 
-## Implementation status and review trigger
+## Implemented workspace slice
 
-Only in-memory contracts and cross-record validation exist. No database, Supabase client, bucket,
-migration, pgvector extension, RLS policy, or authorization implementation exists. Review during Step
-2.1 and again before the first persistence migration.
+Step 2.2 implements SQLAlchemy async access, Alembic, minimal users/workspaces/memberships, a restricted
+runtime role, transaction-local verified identity, application permission checks, RLS reads, and
+guarded database mutations. Application tables remain outside the exposed API schema. A non-login
+owner provides the narrowly controlled RLS-bypassing function boundary; normal runtime credentials
+cannot bypass RLS or write tables directly. Workspace row locks serialize last-owner changes.
+
+Object storage, pgvector, prospect/research tables, invitation delivery, and audit history remain
+unimplemented. Review this ADR when the first business-data table is added so its policy follows the
+same identity and workspace boundary.

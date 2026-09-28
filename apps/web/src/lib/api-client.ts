@@ -1,4 +1,11 @@
-import type { HealthResponse, MeResponse } from "@/lib/types";
+import type {
+  HealthResponse,
+  MeResponse,
+  MemberPage,
+  Workspace,
+  WorkspacePage,
+  WorkspaceRole,
+} from "@/lib/types";
 import { parsePublicApiBaseUrl, PublicConfigurationError } from "@/lib/config";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
@@ -18,6 +25,17 @@ export class IdentityRequestError extends Error {
   ) {
     super(userMessage);
     this.name = "IdentityRequestError";
+  }
+}
+
+export class WorkspaceApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly code: string,
+    public readonly userMessage: string,
+  ) {
+    super(userMessage);
+    this.name = "WorkspaceApiError";
   }
 }
 
@@ -174,4 +192,135 @@ export async function fetchCurrentPrincipal(signal?: AbortSignal): Promise<MeRes
     throw new IdentityRequestError("invalid-response", "The identity response was not recognized.");
   }
   return payload;
+}
+
+async function authenticatedRequest(
+  path: string,
+  init: RequestInit = {},
+  signal?: AbortSignal,
+): Promise<Response> {
+  let apiBaseUrl: string;
+  try {
+    apiBaseUrl = parsePublicApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
+  } catch (error: unknown) {
+    if (error instanceof PublicConfigurationError) {
+      throw new WorkspaceApiError(0, "configuration", error.userMessage);
+    }
+    throw error;
+  }
+  const supabase = createSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  let token = data.session?.access_token;
+  if (!token) throw new WorkspaceApiError(401, "authentication", "Your session has ended.");
+
+  const request = (accessToken: string) =>
+    fetch(`${apiBaseUrl}/api/v1${path}`, {
+      ...init,
+      headers: {
+        Accept: "application/json",
+        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        ...init.headers,
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+      signal,
+    });
+  let response: Response;
+  try {
+    response = await request(token);
+    if (response.status === 401) {
+      token = (await refreshAccessToken()) ?? undefined;
+      if (!token) throw new WorkspaceApiError(401, "authentication", "Your session has ended.");
+      response = await request(token);
+    }
+  } catch (error: unknown) {
+    if (error instanceof WorkspaceApiError || signal?.aborted) throw error;
+    throw new WorkspaceApiError(0, "unavailable", "The workspace service could not be reached.");
+  }
+  if (!response.ok) {
+    let detail: { code?: string; message?: string } = {};
+    try {
+      const payload = (await response.json()) as { detail?: typeof detail };
+      if (typeof payload.detail === "object" && payload.detail) detail = payload.detail;
+    } catch {
+      // The status still produces a controlled generic message.
+    }
+    throw new WorkspaceApiError(
+      response.status,
+      detail.code ?? "request_failed",
+      detail.message ??
+        (response.status === 401
+          ? "Your session has ended."
+          : "The workspace operation could not be completed."),
+    );
+  }
+  return response;
+}
+
+async function readJson<T>(response: Response): Promise<T> {
+  try {
+    return (await response.json()) as T;
+  } catch {
+    throw new WorkspaceApiError(502, "invalid_response", "The API response was not recognized.");
+  }
+}
+
+export async function fetchWorkspaces(signal?: AbortSignal): Promise<WorkspacePage> {
+  return readJson<WorkspacePage>(await authenticatedRequest("/workspaces?limit=100", {}, signal));
+}
+
+export async function createWorkspace(name: string): Promise<Workspace> {
+  return readJson<Workspace>(
+    await authenticatedRequest("/workspaces", { method: "POST", body: JSON.stringify({ name }) }),
+  );
+}
+
+export async function renameWorkspace(workspaceId: string, name: string): Promise<Workspace> {
+  return readJson<Workspace>(
+    await authenticatedRequest(`/workspaces/${workspaceId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    }),
+  );
+}
+
+export async function fetchWorkspaceMembers(
+  workspaceId: string,
+  signal?: AbortSignal,
+): Promise<MemberPage> {
+  return readJson<MemberPage>(
+    await authenticatedRequest(`/workspaces/${workspaceId}/members?limit=100`, {}, signal),
+  );
+}
+
+export async function addWorkspaceMember(
+  workspaceId: string,
+  userId: string,
+  role: WorkspaceRole,
+): Promise<void> {
+  await authenticatedRequest(`/workspaces/${workspaceId}/members`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId, role }),
+  });
+}
+
+export async function updateWorkspaceMemberRole(
+  workspaceId: string,
+  userId: string,
+  role: WorkspaceRole,
+): Promise<void> {
+  await authenticatedRequest(`/workspaces/${workspaceId}/members/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
+export async function removeWorkspaceMember(workspaceId: string, userId: string): Promise<void> {
+  await authenticatedRequest(`/workspaces/${workspaceId}/members/${userId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function leaveWorkspace(workspaceId: string): Promise<void> {
+  await authenticatedRequest(`/workspaces/${workspaceId}/leave`, { method: "POST" });
 }

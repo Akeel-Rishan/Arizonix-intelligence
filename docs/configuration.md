@@ -2,26 +2,33 @@
 
 ## Configuration contract
 
-| Name                                              | Purpose and allowed values                                         | Default                  | Visibility                             | Read time                 |
-| ------------------------------------------------- | ------------------------------------------------------------------ | ------------------------ | -------------------------------------- | ------------------------- |
-| `ARIZONIX_APP_ENVIRONMENT`                        | API environment: `development`, `test`, or `production`            | `development`            | Server-only                            | API startup               |
-| `ARIZONIX_APP_VERSION`                            | Non-empty version returned by health and OpenAPI metadata          | `0.1.0`                  | Server response includes version       | API startup               |
-| `ARIZONIX_LOG_LEVEL`                              | `debug`, `info`, `warning`, `error`, or `critical`                 | `info`                   | Server-only                            | API startup               |
-| `ARIZONIX_ALLOWED_ORIGINS`                        | Comma-separated or JSON array of exact HTTP(S) browser origins     | Local ports 3000         | Server-only                            | API startup               |
-| `ARIZONIX_SUPABASE_URL`                           | Supabase project origin used to derive the JWT issuer and JWKS URL | None; `/me` fails closed | Server-only, not secret                | API startup               |
-| `ARIZONIX_SUPABASE_JWT_AUDIENCE`                  | Required access-token audience                                     | `authenticated`          | Server-only, not secret                | API startup               |
-| `ARIZONIX_SUPABASE_JWKS_CACHE_SECONDS`            | Successful JWKS cache TTL, 1–86400                                 | `600`                    | Server-only                            | API startup               |
-| `ARIZONIX_SUPABASE_JWKS_REFRESH_COOLDOWN_SECONDS` | Unknown-key refresh throttle, 1–3600                               | `30`                     | Server-only                            | API startup               |
-| `ARIZONIX_SUPABASE_HTTP_TIMEOUT_SECONDS`          | JWKS timeout, greater than 0 and at most 30                        | `5`                      | Server-only                            | API startup               |
-| `ARIZONIX_SUPABASE_JWT_CLOCK_SKEW_SECONDS`        | JWT time-claim tolerance, 0–300                                    | `30`                     | Server-only                            | API startup               |
-| `NEXT_PUBLIC_API_BASE_URL`                        | HTTP(S) origin of the API, without `/api/v1` or another path       | `http://127.0.0.1:8000`  | Public, embedded in browser JavaScript | Next.js build/dev startup |
-| `NEXT_PUBLIC_SITE_URL`                            | Canonical web origin for confirmation redirects                    | `http://127.0.0.1:3000`  | Public                                 | Next.js build/dev startup |
-| `NEXT_PUBLIC_SUPABASE_URL`                        | Supabase project origin                                            | Required for auth        | Public                                 | Next.js build/dev startup |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`            | Supabase publishable key                                           | Required for auth        | Public by design                       | Next.js build/dev startup |
-| `API_HOST_PORT`                                   | Host loopback port published by Compose for the API                | `8000`                   | Local Compose setting                  | Compose interpolation     |
-| `WEB_HOST_PORT`                                   | Host loopback port published by Compose for the web app            | `3000`                   | Local Compose setting                  | Compose interpolation     |
+| Name                                              | Purpose and allowed values                                            | Default                  | Visibility                             | Read time                 |
+| ------------------------------------------------- | --------------------------------------------------------------------- | ------------------------ | -------------------------------------- | ------------------------- |
+| `ARIZONIX_APP_ENVIRONMENT`                        | API environment: `development`, `test`, or `production`               | `development`            | Server-only                            | API startup               |
+| `ARIZONIX_APP_VERSION`                            | Non-empty version returned by health and OpenAPI metadata             | `0.1.0`                  | Server response includes version       | API startup               |
+| `ARIZONIX_LOG_LEVEL`                              | `debug`, `info`, `warning`, `error`, or `critical`                    | `info`                   | Server-only                            | API startup               |
+| `ARIZONIX_ALLOWED_ORIGINS`                        | Comma-separated or JSON array of exact HTTP(S) browser origins        | Local ports 3000         | Server-only                            | API startup               |
+| `ARIZONIX_SUPABASE_URL`                           | Supabase project origin used to derive the JWT issuer and JWKS URL    | None; `/me` fails closed | Server-only, not secret                | API startup               |
+| `ARIZONIX_SUPABASE_JWT_AUDIENCE`                  | Required access-token audience                                        | `authenticated`          | Server-only, not secret                | API startup               |
+| `ARIZONIX_SUPABASE_JWKS_CACHE_SECONDS`            | Successful JWKS cache TTL, 1–86400                                    | `600`                    | Server-only                            | API startup               |
+| `ARIZONIX_SUPABASE_JWKS_REFRESH_COOLDOWN_SECONDS` | Unknown-key refresh throttle, 1–3600                                  | `30`                     | Server-only                            | API startup               |
+| `ARIZONIX_SUPABASE_HTTP_TIMEOUT_SECONDS`          | JWKS timeout, greater than 0 and at most 30                           | `5`                      | Server-only                            | API startup               |
+| `ARIZONIX_SUPABASE_JWT_CLOCK_SKEW_SECONDS`        | JWT time-claim tolerance, 0–300                                       | `30`                     | Server-only                            | API startup               |
+| `ARIZONIX_DATABASE_URL`                           | Restricted `postgresql+asyncpg` runtime URL                           | None; workspace API 503  | Server-only secret                     | API startup               |
+| `ARIZONIX_DATABASE_POOL_SIZE`                     | Persistent runtime pool size, 1–50                                    | `5`                      | Server-only                            | API startup               |
+| `ARIZONIX_DATABASE_MAX_OVERFLOW`                  | Temporary connections beyond the pool, 0–50                           | `5`                      | Server-only                            | API startup               |
+| `ARIZONIX_DATABASE_POOL_TIMEOUT_SECONDS`          | Pool checkout timeout, greater than 0 and at most 60                  | `10`                     | Server-only                            | API startup               |
+| `ARIZONIX_DATABASE_DISABLE_STATEMENT_CACHE`       | Disable driver/dialect statement caches; not transaction-mode support | `false`                  | Server-only                            | API startup               |
+| `ARIZONIX_MIGRATION_DATABASE_URL`                 | Privileged URL for bootstrap and Alembic only                         | None                     | Administrative secret                  | Migration command         |
+| `ARIZONIX_RUNTIME_DATABASE_PASSWORD`              | Password applied to the restricted runtime role                       | None                     | Administrative secret                  | Bootstrap command         |
+| `NEXT_PUBLIC_API_BASE_URL`                        | HTTP(S) origin of the API, without `/api/v1` or another path          | `http://127.0.0.1:8000`  | Public, embedded in browser JavaScript | Next.js build/dev startup |
+| `NEXT_PUBLIC_SITE_URL`                            | Canonical web origin for confirmation redirects                       | `http://127.0.0.1:3000`  | Public                                 | Next.js build/dev startup |
+| `NEXT_PUBLIC_SUPABASE_URL`                        | Supabase project origin                                               | Required for auth        | Public                                 | Next.js build/dev startup |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`            | Supabase publishable key                                              | Required for auth        | Public by design                       | Next.js build/dev startup |
+| `API_HOST_PORT`                                   | Host loopback port published by Compose for the API                   | `8000`                   | Local Compose setting                  | Compose interpolation     |
+| `WEB_HOST_PORT`                                   | Host loopback port published by Compose for the web app               | `3000`                   | Local Compose setting                  | Compose interpolation     |
 
-No listed value is a secret. The publishable key is intentionally public. Never place the Supabase service-role key, a JWT signing key, or any other secret in a `NEXT_PUBLIC_` variable because Next.js embeds it into the browser bundle. This step does not use a service-role key.
+Database URLs/passwords are secrets; the publishable key and project URL are intentionally public. Never place a database password, Supabase service-role key, JWT signing key, or any other secret in a `NEXT_PUBLIC_` variable because Next.js embeds it into the browser bundle. This application does not use a service-role key.
 
 ## Supabase dashboard setup
 
@@ -45,6 +52,10 @@ The public API convention is origin-only. The client owns the `/api/v1/health` p
 - `compose.yaml` explicitly passes server settings to the API and passes the public API origin as a web image build argument.
 
 These files serve different launch modes and do not automatically override one another.
+
+The migration URL and bootstrap password should normally be supplied only to one-off commands. The
+running API needs only `ARIZONIX_DATABASE_URL`. See [database.md](database.md) for connection choices,
+role provisioning, pooler compatibility, and migration commands.
 
 ## Precedence
 

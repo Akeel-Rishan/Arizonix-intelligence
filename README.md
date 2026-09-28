@@ -1,8 +1,8 @@
 # Arizonix Intelligence
 
-Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides a reproducible local foundation with Supabase email/password authentication, protected application routes, a locally verified API identity boundary, typed domain contracts, synthetic evaluation fixtures, automated quality checks, optional containers, and CI definitions.
+Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides Supabase authentication, protected routes, verified API identity, PostgreSQL workspaces and memberships, role authorization with row-level security, typed domain contracts, automated checks, optional containers, and CI definitions.
 
-It does not yet include application database tables, workspace membership or roles, agents, scraping, outreach, external research providers, deployment, or complete production security controls.
+It does not yet include invitations, prospect/research persistence, agents, scraping, outreach, external research providers, deployment, the full audit log, or complete production security controls.
 
 ## Direct local development
 
@@ -31,13 +31,13 @@ npm run dev
 - API health: <http://127.0.0.1:8000/api/v1/health>
 - FastAPI documentation: <http://127.0.0.1:8000/docs>
 
-Before signing in, replace the Supabase placeholders in both copied environment files and complete the dashboard settings in [authentication.md](docs/authentication.md). The full environment contract is in [configuration.md](docs/configuration.md). Missing auth configuration fails closed with setup guidance; health remains public.
+Before signing in, replace the Supabase placeholders, complete [authentication setup](docs/authentication.md), and apply the [database bootstrap and migration](docs/database.md). The authorization design is in [authorization.md](docs/authorization.md).
 
 See [development.md](docs/development.md) for macOS/Linux commands, browser tests, supported runtimes, and troubleshooting.
 
 ## Optional Docker Compose
 
-Docker runs only the API and web application. It is a production-build smoke environment, not a hot-reload workflow.
+Docker runs the API and web application; an opt-in `database` profile supplies disposable PostgreSQL for local RLS verification. It is not a hot-reload workflow.
 
 ```powershell
 Copy-Item .env.example .env

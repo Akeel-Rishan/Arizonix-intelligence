@@ -17,6 +17,9 @@ The Python and Node container images are pinned to Python 3.12.13 and Node.js 22
 
 Direct local development is the primary workflow and does not require Docker.
 
+Workspace endpoints additionally require PostgreSQL roles and migrations. Use the opt-in Compose
+database and exact commands in [database.md](database.md), or configure equivalent PostgreSQL URLs.
+
 Windows PowerShell, from the repository root:
 
 ```powershell
@@ -138,4 +141,6 @@ Container hot reload is intentionally not configured. Source edits require rebui
 - Confirmation returns to sign-in: verify the dashboard Site URL, redirect allowlist, confirmation template, and exact host (`127.0.0.1` versus `localhost`) match the configured `NEXT_PUBLIC_SITE_URL`.
 - Docker build cannot download packages or images: verify Docker Desktop or the Docker daemon has network access, then retry `docker compose build --no-cache`.
 - Browser binary missing: run `npx playwright install chromium` locally or `npx playwright install --with-deps chromium` on Linux CI.
-- Occupied Playwright port 3100: stop the unrelated process. CI disables server reuse so it cannot accidentally test another application.
+- Workspace API returns 503: set the restricted `ARIZONIX_DATABASE_URL`, bootstrap roles, apply Alembic migrations, and restart the API.
+- Database permission error: confirm the API URL uses `arizonix_runtime`, not the migration user, then rerun bootstrap and `alembic upgrade head`.
+- Playwright uses `.next-e2e`, so it can run alongside the normal Next dev server without sharing its build lock.

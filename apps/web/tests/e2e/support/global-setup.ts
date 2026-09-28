@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess } from "node:child_process";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 async function waitUntilReady(child: ChildProcess, url: string, label: string): Promise<void> {
@@ -28,6 +29,10 @@ async function stopProcessTree(child: ChildProcess): Promise<void> {
 
 export default async function globalSetup(): Promise<() => Promise<void>> {
   const root = process.cwd();
+  const generatedFiles = [path.resolve(root, "next-env.d.ts"), path.resolve(root, "tsconfig.json")];
+  const generatedSnapshots = await Promise.all(
+    generatedFiles.map((file) => readFile(file, "utf8")),
+  );
   const mockScript = path.resolve(root, "tests/e2e/support/mock-supabase-server.mjs");
   const mock = spawn(process.execPath, [mockScript], {
     detached: process.platform !== "win32",
@@ -48,6 +53,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       stdio: "ignore",
       env: {
         ...process.env,
+        NEXT_TEST_DIST_DIR: ".next-e2e",
         NEXT_PUBLIC_API_BASE_URL: apiUrl,
         NEXT_PUBLIC_SITE_URL: "http://127.0.0.1:3100",
         NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
@@ -60,5 +66,8 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   return async () => {
     await stopProcessTree(web);
     await stopProcessTree(mock);
+    await Promise.all(
+      generatedFiles.map((file, index) => writeFile(file, generatedSnapshots[index], "utf8")),
+    );
   };
 }

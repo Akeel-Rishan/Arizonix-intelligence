@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { navigationItems } from "@/lib/navigation";
 import { UserMenu } from "@/components/auth/user-menu";
+import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
 
 function isActiveRoute(pathname: string, href: string): boolean {
   return href === "/" ? pathname === href : pathname.startsWith(href);
@@ -21,6 +22,7 @@ export function Sidebar({ email }: { email: string | null }) {
           Evidence-driven business research.
         </p>
       </div>
+      <WorkspaceSwitcher />
       <nav aria-label="Primary" className="mt-10">
         <ul className="space-y-1.5">
           {navigationItems.map((item) => {

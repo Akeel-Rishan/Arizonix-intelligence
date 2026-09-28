@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { navigationItems } from "@/lib/navigation";
 import { UserMenu } from "@/components/auth/user-menu";
+import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
 
 export function MobileNavigation({ email }: { email: string | null }) {
   const [open, setOpen] = useState(false);
@@ -101,6 +102,7 @@ export function MobileNavigation({ email }: { email: string | null }) {
                 Close
               </button>
             </div>
+            <WorkspaceSwitcher compact />
             <nav aria-label="Primary" className="mt-6">
               <ul className="space-y-2">
                 {navigationItems.map((item) => {

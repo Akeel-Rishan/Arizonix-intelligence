@@ -1,6 +1,23 @@
 name: arizonix-intelligence
 
 services:
+  db:
+    image: postgres:17-alpine
+    profiles: ["database"]
+    environment:
+      POSTGRES_DB: "${ARIZONIX_LOCAL_POSTGRES_DB:-arizonix}"
+      POSTGRES_PASSWORD: "${ARIZONIX_LOCAL_POSTGRES_PASSWORD:-local-dev-only}"
+      POSTGRES_USER: "${ARIZONIX_LOCAL_POSTGRES_USER:-postgres}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "127.0.0.1:${ARIZONIX_LOCAL_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - arizonix-postgres:/var/lib/postgresql/data
+
   api:
     build:
       context: ./apps/api
@@ -10,6 +27,8 @@ services:
       ARIZONIX_APP_ENVIRONMENT: "${ARIZONIX_APP_ENVIRONMENT:-development}"
       ARIZONIX_APP_VERSION: "${ARIZONIX_APP_VERSION:-0.1.0}"
       ARIZONIX_LOG_LEVEL: "${ARIZONIX_LOG_LEVEL:-info}"
+      ARIZONIX_DATABASE_URL: "${ARIZONIX_DATABASE_URL:-}"
+      ARIZONIX_DATABASE_DISABLE_STATEMENT_CACHE: "${ARIZONIX_DATABASE_DISABLE_STATEMENT_CACHE:-false}"
       ARIZONIX_SUPABASE_JWT_AUDIENCE: "${ARIZONIX_SUPABASE_JWT_AUDIENCE:-authenticated}"
       ARIZONIX_SUPABASE_URL: "${ARIZONIX_SUPABASE_URL:-}"
     init: true
@@ -33,3 +52,6 @@ services:
     ports:
       - "127.0.0.1:${WEB_HOST_PORT:-3000}:3000"
     stop_grace_period: 15s
+
+volumes:
+  arizonix-postgres:

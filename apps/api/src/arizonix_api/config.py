@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     supabase_jwks_refresh_cooldown_seconds: int = Field(default=30, ge=1, le=3_600)
     supabase_http_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
     supabase_jwt_clock_skew_seconds: int = Field(default=30, ge=0, le=300)
+    database_url: str | None = None
+    database_pool_size: int = Field(default=5, ge=1, le=50)
+    database_max_overflow: int = Field(default=5, ge=0, le=50)
+    database_pool_timeout_seconds: float = Field(default=10, gt=0, le=60)
+    database_disable_statement_cache: bool = False
 
     @field_validator("app_version")
     @classmethod
@@ -120,6 +125,18 @@ class Settings(BaseSettings):
         normalized = value.strip()
         if not normalized:
             raise ValueError("Supabase JWT audience must not be empty")
+        return normalized
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: object) -> object:
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return None
+        if not isinstance(value, str):
+            return value
+        normalized = value.strip()
+        if not normalized.startswith("postgresql+asyncpg://"):
+            raise ValueError("database URL must use postgresql+asyncpg")
         return normalized
 
     @property

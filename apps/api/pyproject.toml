@@ -4,10 +4,13 @@ version = "0.1.0"
 description = "Local API foundation for Arizonix Intelligence"
 requires-python = ">=3.12,<3.15"
 dependencies = [
+  "alembic>=1.16,<2",
+  "asyncpg>=0.30,<1",
   "fastapi>=0.141,<0.142",
   "httpx>=0.28,<1",
   "pydantic-settings>=2.10,<3",
   "pyjwt[crypto]>=2.10,<3",
+  "sqlalchemy[asyncio]>=2.0,<2.1",
   "uvicorn[standard]>=0.35,<1",
 ]
 
@@ -29,6 +32,7 @@ packages = ["src/arizonix_api"]
 addopts = "-q"
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = ["postgres: requires the disposable PostgreSQL/RLS test database"]
 
 [tool.ruff]
 line-length = 100
@@ -36,4 +40,3 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-

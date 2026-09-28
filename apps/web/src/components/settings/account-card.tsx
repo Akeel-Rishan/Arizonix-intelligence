@@ -12,6 +12,7 @@ type AccountState =
 
 export function AccountCard() {
   const [state, setState] = useState<AccountState>({ kind: "loading" });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -56,8 +57,22 @@ export function AccountCard() {
             <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               User ID
             </dt>
-            <dd className="mt-1 break-all font-mono text-xs text-slate-700">
-              {state.principal.user_id}
+            <dd className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <span className="break-all font-mono text-xs text-slate-700">
+                {state.principal.user_id}
+              </span>
+              <button
+                className="min-h-9 self-start rounded-lg border border-slate-300 px-3 text-xs font-semibold outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-cyan-500"
+                onClick={() => {
+                  void navigator.clipboard.writeText(state.principal.user_id).then(() => {
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 1500);
+                  });
+                }}
+                type="button"
+              >
+                {copied ? "Copied" : "Copy ID"}
+              </button>
             </dd>
           </div>
         </dl>

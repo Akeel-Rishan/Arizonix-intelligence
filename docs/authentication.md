@@ -118,4 +118,6 @@ The repository's deterministic suite exercises the same SDK and cookie flow agai
 - **503 from `/me`:** verify the API can reach the configured trusted JWKS endpoint and that the project uses an asymmetric signing key.
 - **401 from `/me`:** sign in again and confirm issuer, audience, subject, expiry, and project URL match. Public errors intentionally omit cryptographic detail.
 
-Workspace membership, roles, database migrations, row-level security, tenant isolation, and business-data authorization are deferred to Step 2.2. A valid identity alone does not grant access to future workspace data.
+Workspace membership, roles, database migrations, and row-level security are implemented in Step 2.2.
+A valid identity alone grants no workspace access; see [authorization.md](authorization.md). Invitations,
+business-data authorization, and full audit logging remain deferred.

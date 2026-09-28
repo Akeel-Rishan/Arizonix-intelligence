@@ -5,7 +5,8 @@
 - Step 1.1: **user-verified**
 - Step 1.2: **user-verified**
 - Step 1.3: **user-verified**
-- Step 2.1: **awaiting user verification**
+- Step 2.1: **user-verified**
+- Step 2.2: **awaiting user verification**
 
 ## Completed foundation
 
@@ -98,6 +99,38 @@ Executed locally on 2026-09-28.
 
 The test-only Supabase-compatible server validates application flows using the real Supabase SDK and SSR cookies, but it does not prove live provider configuration or email delivery. The real-process API lifecycle check uses an isolated port so an existing development API cannot invalidate its CORS result.
 
+## Step 2.2 scope implemented
+
+- Async SQLAlchemy runtime access and Alembic migrations with separate privileged migration and
+  restricted runtime credentials.
+- Minimal users, workspaces, memberships, an explicit role matrix, atomic first-owner creation,
+  serialized last-owner protection, RLS, exact grants, and guarded functions.
+- Workspace APIs, onboarding, switching, responsive settings, existing-user UUID membership flow,
+  role controls, confirmations, and cache clearing on sign-out.
+- An opt-in PostgreSQL Compose profile and CI PostgreSQL service with fresh migrations and restricted
+  role integration tests.
+
+## Step 2.2 verification record
+
+Executed locally on 2026-09-28.
+
+| Check                                        | Outcome                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------ |
+| Backend Ruff lint/format                     | PASS                                                                           |
+| Backend unit and PostgreSQL tests            | PASS; 63 passed with the restricted runtime role                               |
+| Frontend ESLint/Prettier/TypeScript          | PASS                                                                           |
+| Next.js production build                     | PASS; onboarding and all protected routes generated                            |
+| Mocked workspace browser tests               | PASS; 4 tests                                                                  |
+| Default deterministic browser suite          | PASS; 16 tests passed, 2 separately gated                                      |
+| Invalid-config and real-API lifecycle gates  | PASS; 1 test in each isolated run                                              |
+| Fresh Alembic migration                      | PASS; applied to disposable PostgreSQL 17 from empty state                     |
+| Real PostgreSQL/RLS integration tests        | PASS; 3 tests cover RLS, privileges, concurrency, pooling, and HTTP boundaries |
+| Hosted Supabase migration and two-user check | **NOT RUN**; remote credentials were not used automatically                    |
+| Hosted GitHub Actions                        | **NOT RUN**; changes have not been pushed                                      |
+
+Mocked browser results do not prove RLS; the separate PostgreSQL results above do. CI is configured to
+repeat the fresh migration and restricted-role suite. Hosted Supabase remains a separate user-run check.
+
 ## Next planned step
 
-Step 2.2: workspaces, memberships, roles, database migrations, and row-level security. It is not implemented in Step 2.1.
+Step 2.3: audit logging and authorization tests. It is not implemented in Step 2.2.
