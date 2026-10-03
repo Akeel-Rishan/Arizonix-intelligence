@@ -19,7 +19,7 @@ Supabase Auth      FastAPI at 127.0.0.1:8000
                          | verified subject -> transaction-local identity
                          v
               PostgreSQL arizonix schema
-              (restricted role + RLS + guarded functions)
+              (restricted role + RLS + guarded/audited functions)
 ```
 
 The Next.js App Router application uses `@supabase/ssr` with a per-request server client, browser client, and Next.js 16 proxy. The proxy refreshes cookie-backed sessions; the protected route-group layout independently verifies claims before rendering the research shell. Login, sign-up, email confirmation, check-email, and sign-out are public or server-action boundaries. Return destinations are restricted to local non-auth paths.
@@ -33,6 +33,17 @@ HTTP semantics, while grants, RLS, guarded functions, and workspace-row locks en
 final-owner invariant at the persistence boundary. See [authorization.md](authorization.md) and
 [database.md](database.md).
 
+Consequential workspace and membership mutations now create one bounded append-only audit event inside
+the same database transaction. The request actor and correlation UUID are transaction-local, mutation
+functions are the sole writer, and owner/admin RLS controls audit reads. Authentication/authorization
+failures instead produce redacted structured operational logs because rolled-back attempts are not
+successful business events. See [audit-logging.md](audit-logging.md).
+
+Workspace-scoped company intake is persisted behind the same restricted runtime role. RLS provides
+read isolation; guarded functions enforce owner/admin/analyst writes, optimistic versions, reversible
+archive state, and atomic audit events. The Next.js Prospects routes provide URL-backed filters and
+role-aware create/detail/edit/lifecycle views. See [company-management.md](company-management.md).
+
 ## Domain and evaluation boundary
 
 The backend now contains version 1.0 framework-independent contracts for companies, research projects
@@ -41,8 +52,9 @@ decisions. These models import no FastAPI, persistence library, collector SDK, o
 Strict local validation is complemented by an explicit assembled-record validator for references,
 workspace/company consistency, conflicting links, and minimum structural support for verified claims.
 
-These future research records remain an in-memory contract boundary; Step 2.2 persists only users,
-workspaces, and memberships. No business route exposes the research records. See [domain-model.md](domain-model.md)
+The broader research records remain an in-memory contract boundary. Persistence now covers users,
+workspaces, memberships, manually entered companies, and audit events. Company intake does not claim
+canonical identity; no route exposes the future evidence and research records. See [domain-model.md](domain-model.md)
 for semantics and [the ADR index](adr/README.md) for accepted decisions and implementation status.
 
 The repository-level `evals` directory holds versioned, synthetic, offline cases. Its schema is generated
@@ -83,7 +95,7 @@ The workflow cancels superseded runs, uses bounded timeouts and readiness pollin
 
 Future steps may add:
 
-- PostgreSQL tables and RLS for future prospects, evidence, claims, decisions, and audit history. Only the workspace authorization foundation is implemented.
+- PostgreSQL tables and RLS for future evidence, claims, and decisions.
 - pgvector for evidence retrieval where semantic similarity is justified.
 - Redis and Celery for bounded background work, scheduling, retries, and task visibility.
 - LangGraph for explicit, inspectable coordination among specialized analysis and verification agents.

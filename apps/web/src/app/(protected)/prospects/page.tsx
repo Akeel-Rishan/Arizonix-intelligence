@@ -1,18 +1,19 @@
+import { Suspense } from "react";
+
+import { CompanyList } from "@/components/companies/company-list";
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/ui/empty-state";
 
 export default function ProspectsPage() {
   return (
     <div>
       <PageHeader
         title="Prospects"
-        description="Businesses selected for careful qualification will appear here."
+        description="Workspace companies selected for careful qualification and evidence-backed research."
       />
       <div className="mt-8">
-        <EmptyState
-          title="Prospect intake is not implemented"
-          description="A later step will add validated company intake. No sample businesses are shown."
-        />
+        <Suspense fallback={<p role="status">Loading companies…</p>}>
+          <CompanyList />
+        </Suspense>
       </div>
     </div>
   );

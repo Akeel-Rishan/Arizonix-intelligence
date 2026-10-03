@@ -31,6 +31,34 @@ class MembershipNotFound(WorkspaceServiceError):
     code = "membership_not_found"
 
 
+class AuditEventNotFound(WorkspaceServiceError):
+    code = "audit_event_not_found"
+
+
+class InvalidAuditQuery(WorkspaceServiceError):
+    code = "invalid_audit_query"
+
+
+class AuditPersistenceFailure(WorkspaceServiceError):
+    code = "audit_persistence_failed"
+
+
+class CompanyNotFound(WorkspaceServiceError):
+    code = "company_not_found"
+
+
+class VersionConflict(WorkspaceServiceError):
+    code = "version_conflict"
+
+
+class CompanyLifecycleConflict(WorkspaceServiceError):
+    code = "company_lifecycle_conflict"
+
+
+class InvalidCompanyQuery(WorkspaceServiceError):
+    code = "invalid_company_query"
+
+
 def translate_database_error(error: DBAPIError) -> Never:
     state = getattr(error.orig, "sqlstate", None)
     mapped = {
@@ -40,6 +68,10 @@ def translate_database_error(error: DBAPIError) -> Never:
         "AR004": WorkspaceNotFound,
         "AR005": ApplicationUserNotFound,
         "AR006": MembershipNotFound,
+        "AR007": AuditPersistenceFailure,
+        "AR008": VersionConflict,
+        "AR009": CompanyLifecycleConflict,
+        "AR010": CompanyNotFound,
     }.get(state)
     if mapped is None:
         raise error

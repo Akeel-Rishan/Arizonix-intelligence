@@ -119,5 +119,8 @@ The repository's deterministic suite exercises the same SDK and cookie flow agai
 - **401 from `/me`:** sign in again and confirm issuer, audience, subject, expiry, and project URL match. Public errors intentionally omit cryptographic detail.
 
 Workspace membership, roles, database migrations, and row-level security are implemented in Step 2.2.
-A valid identity alone grants no workspace access; see [authorization.md](authorization.md). Invitations,
-business-data authorization, and full audit logging remain deferred.
+A valid identity alone grants no workspace access; see [authorization.md](authorization.md). Step 2.3
+adds transaction-local request correlation, durable successful-mutation events, and redacted security
+logs; see [audit-logging.md](audit-logging.md). Step 3.1 company authorization uses the same verified
+identity and transaction context; see [company-management.md](company-management.md). Invitations and
+later evidence/research authorization remain deferred.

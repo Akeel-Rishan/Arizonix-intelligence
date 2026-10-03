@@ -1,5 +1,11 @@
 import type {
   HealthResponse,
+  AuditAction,
+  AuditEventPage,
+  Company,
+  CompanyArchiveFilter,
+  CompanyInput,
+  CompanyPage,
   MeResponse,
   MemberPage,
   Workspace,
@@ -323,4 +329,112 @@ export async function removeWorkspaceMember(workspaceId: string, userId: string)
 
 export async function leaveWorkspace(workspaceId: string): Promise<void> {
   await authenticatedRequest(`/workspaces/${workspaceId}/leave`, { method: "POST" });
+}
+
+export type AuditEventFilters = {
+  action?: AuditAction;
+  occurredFrom?: string;
+  occurredTo?: string;
+};
+
+export async function fetchAuditEvents(
+  workspaceId: string,
+  filters: AuditEventFilters,
+  cursor?: string,
+  signal?: AbortSignal,
+): Promise<AuditEventPage> {
+  const query = new URLSearchParams({ limit: "25" });
+  if (filters.action) query.set("action", filters.action);
+  if (filters.occurredFrom) query.set("occurred_from", filters.occurredFrom);
+  if (filters.occurredTo) query.set("occurred_to", filters.occurredTo);
+  if (cursor) query.set("cursor", cursor);
+  return readJson<AuditEventPage>(
+    await authenticatedRequest(
+      `/workspaces/${workspaceId}/audit-events?${query.toString()}`,
+      {},
+      signal,
+    ),
+  );
+}
+
+export type CompanyFilters = {
+  archive?: CompanyArchiveFilter;
+  search?: string;
+  industry?: string;
+  countryCode?: string;
+};
+
+export async function fetchCompanies(
+  workspaceId: string,
+  filters: CompanyFilters,
+  cursor?: string,
+  signal?: AbortSignal,
+): Promise<CompanyPage> {
+  const query = new URLSearchParams({ limit: "25", archive: filters.archive ?? "active" });
+  if (filters.search) query.set("search", filters.search);
+  if (filters.industry) query.set("industry", filters.industry);
+  if (filters.countryCode) query.set("country_code", filters.countryCode);
+  if (cursor) query.set("cursor", cursor);
+  return readJson<CompanyPage>(
+    await authenticatedRequest(
+      `/workspaces/${workspaceId}/companies?${query.toString()}`,
+      {},
+      signal,
+    ),
+  );
+}
+
+export async function fetchCompany(
+  workspaceId: string,
+  companyId: string,
+  signal?: AbortSignal,
+): Promise<Company> {
+  return readJson<Company>(
+    await authenticatedRequest(`/workspaces/${workspaceId}/companies/${companyId}`, {}, signal),
+  );
+}
+
+export async function createCompany(workspaceId: string, input: CompanyInput): Promise<Company> {
+  return readJson<Company>(
+    await authenticatedRequest(`/workspaces/${workspaceId}/companies`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  );
+}
+
+export async function updateCompany(
+  workspaceId: string,
+  companyId: string,
+  expectedVersion: number,
+  input: CompanyInput,
+): Promise<Company> {
+  return readJson<Company>(
+    await authenticatedRequest(`/workspaces/${workspaceId}/companies/${companyId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ expected_version: expectedVersion, ...input }),
+    }),
+  );
+}
+
+async function changeCompanyArchiveState(
+  workspaceId: string,
+  companyId: string,
+  expectedVersion: number,
+  action: "archive" | "restore",
+): Promise<Company> {
+  return readJson<Company>(
+    await authenticatedRequest(`/workspaces/${workspaceId}/companies/${companyId}/${action}`, {
+      method: "POST",
+      body: JSON.stringify({ expected_version: expectedVersion }),
+    }),
+  );
+}
+
+export function archiveCompany(workspaceId: string, companyId: string, expectedVersion: number) {
+  return changeCompanyArchiveState(workspaceId, companyId, expectedVersion, "archive");
+}
+
+export function restoreCompany(workspaceId: string, companyId: string, expectedVersion: number) {
+  return changeCompanyArchiveState(workspaceId, companyId, expectedVersion, "restore");
 }

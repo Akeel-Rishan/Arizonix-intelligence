@@ -3,6 +3,7 @@ import pytest
 from arizonix_api.authorization.permissions import (
     can_add_member,
     can_change_role,
+    can_mutate_company,
     can_remove_member,
     can_rename,
 )
@@ -46,3 +47,11 @@ def test_read_only_roles_cannot_administer(actor: WorkspaceRole) -> None:
         assert not can_add_member(actor, role)
         assert not can_change_role(actor, role, WorkspaceRole.VIEWER)
         assert not can_remove_member(actor, role)
+
+
+@pytest.mark.parametrize(
+    ("role", "allowed"),
+    [("owner", True), ("admin", True), ("analyst", True), ("viewer", False)],
+)
+def test_company_mutation_permission_matrix(role: str, allowed: bool) -> None:
+    assert can_mutate_company(WorkspaceRole(role)) is allowed

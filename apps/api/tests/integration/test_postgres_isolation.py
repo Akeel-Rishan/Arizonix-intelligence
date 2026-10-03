@@ -46,6 +46,10 @@ async def as_user(
             {"user_id": str(user_id)},
         )
         await connection.execute(
+            text("SELECT set_config('arizonix.request_id', :request_id, true)"),
+            {"request_id": str(uuid4())},
+        )
+        await connection.execute(
             text("SELECT arizonix.provision_application_user(:user_id, :email)"),
             {"user_id": user_id, "email": f"{user_id}@example.test"},
         )
@@ -70,7 +74,7 @@ def test_real_postgres_rls_roles_and_permission_boundaries() -> None:
         try:
             async with admin_engine.connect() as connection:
                 assert await connection.scalar(text("SELECT version_num FROM alembic_version")) == (
-                    "20260928_0001"
+                    "20261003_0003"
                 )
 
             for user_id in (owner, admin, analyst, viewer, outsider):
@@ -298,6 +302,20 @@ def test_last_owner_concurrency_missing_identity_and_pool_cleanup() -> None:
                 assert remaining == 1
 
             remaining_owner = first if outcomes[0] == "ok" else second
+            removed_owner = second if outcomes[0] == "ok" else first
+            removal_details = await as_user(
+                runtime,
+                remaining_owner,
+                lambda connection: scalar(
+                    connection,
+                    "SELECT details FROM arizonix.audit_events "
+                    "WHERE workspace_id = :workspace AND action = 'membership.removed' "
+                    "ORDER BY occurred_at DESC, id DESC LIMIT 1",
+                    workspace=workspace_id,
+                ),
+            )
+            assert removal_details["target_user_id"] == str(removed_owner)
+            assert removal_details["previous_role"] == "owner"
             with pytest.raises(DBAPIError) as last_owner:
                 await as_user(
                     runtime,
@@ -327,11 +345,17 @@ def test_last_owner_concurrency_missing_identity_and_pool_cleanup() -> None:
                     remaining_owner,
                     lambda connection: (_ for _ in ()).throw(RuntimeError("request failed")),
                 )
-            async with runtime.begin() as connection:
-                identity = await connection.scalar(text("SELECT arizonix.current_user_id()"))
-                visible = await connection.scalar(text("SELECT count(*) FROM arizonix.workspaces"))
-                assert identity is None
-                assert visible == 0
+                async with runtime.begin() as connection:
+                    identity = await connection.scalar(text("SELECT arizonix.current_user_id()"))
+                    request_id = await connection.scalar(
+                        text("SELECT arizonix.current_request_id()")
+                    )
+                    visible = await connection.scalar(
+                        text("SELECT count(*) FROM arizonix.workspaces")
+                    )
+                    assert identity is None
+                    assert request_id is None
+                    assert visible == 0
         finally:
             await runtime.dispose()
             await admin_engine.dispose()

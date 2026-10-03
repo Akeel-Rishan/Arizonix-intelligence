@@ -57,6 +57,10 @@ async def authenticated_session(
             {"user_id": str(principal.user_id)},
         )
         await session.execute(
+            text("SELECT set_config('arizonix.request_id', :request_id, true)"),
+            {"request_id": str(request.state.request_id)},
+        )
+        await session.execute(
             text("SELECT arizonix.provision_application_user(:user_id, :email)"),
             {"user_id": principal.user_id, "email": principal.email},
         )

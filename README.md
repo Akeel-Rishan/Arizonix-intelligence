@@ -1,8 +1,8 @@
 # Arizonix Intelligence
 
-Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides Supabase authentication, protected routes, verified API identity, PostgreSQL workspaces and memberships, role authorization with row-level security, typed domain contracts, automated checks, optional containers, and CI definitions.
+Arizonix Intelligence is an evidence-driven client research platform. The current implementation provides Supabase authentication, protected routes, verified API identity, PostgreSQL workspaces, memberships and company intake, role authorization with row-level security, append-only audit history, typed domain contracts, automated checks, optional containers, and CI definitions.
 
-It does not yet include invitations, prospect/research persistence, agents, scraping, outreach, external research providers, deployment, the full audit log, or complete production security controls.
+It does not yet include invitations, company identity resolution/deduplication, research/evidence persistence, agents, scraping, outreach, external research providers, deployment, or complete production security controls.
 
 ## Direct local development
 
@@ -31,7 +31,7 @@ npm run dev
 - API health: <http://127.0.0.1:8000/api/v1/health>
 - FastAPI documentation: <http://127.0.0.1:8000/docs>
 
-Before signing in, replace the Supabase placeholders, complete [authentication setup](docs/authentication.md), and apply the [database bootstrap and migration](docs/database.md). The authorization design is in [authorization.md](docs/authorization.md).
+Before signing in, replace the Supabase placeholders, complete [authentication setup](docs/authentication.md), and apply the [database bootstrap and migration](docs/database.md). The authorization design is in [authorization.md](docs/authorization.md), the audit guarantees are in [audit-logging.md](docs/audit-logging.md), and the company workflow is in [company-management.md](docs/company-management.md).
 
 See [development.md](docs/development.md) for macOS/Linux commands, browser tests, supported runtimes, and troubleshooting.
 

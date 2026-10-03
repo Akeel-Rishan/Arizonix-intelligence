@@ -40,6 +40,10 @@ guarded database mutations. Application tables remain outside the exposed API sc
 owner provides the narrowly controlled RLS-bypassing function boundary; normal runtime credentials
 cannot bypass RLS or write tables directly. Workspace row locks serialize last-owner changes.
 
-Object storage, pgvector, prospect/research tables, invitation delivery, and audit history remain
-unimplemented. Review this ADR when the first business-data table is added so its policy follows the
-same identity and workspace boundary.
+Step 2.3 extends this slice with workspace-scoped audit events written atomically by the guarded
+mutation functions. The runtime role cannot fabricate or mutate audit rows, while owner/admin RLS
+controls reads. See [../audit-logging.md](../audit-logging.md) for guarantees and limitations.
+
+Object storage, pgvector, prospect/research tables, and invitation delivery remain unimplemented.
+Review this ADR when the first business-data table is added so its policy follows the same identity and
+workspace boundary.

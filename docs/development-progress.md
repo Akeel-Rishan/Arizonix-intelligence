@@ -6,7 +6,9 @@
 - Step 1.2: **user-verified**
 - Step 1.3: **user-verified**
 - Step 2.1: **user-verified**
-- Step 2.2: **awaiting user verification**
+- Step 2.2: **user-verified**
+- Step 2.3: **user-verified**
+- Step 3.1: **awaiting user verification**
 
 ## Completed foundation
 
@@ -131,6 +133,75 @@ Executed locally on 2026-09-28.
 Mocked browser results do not prove RLS; the separate PostgreSQL results above do. CI is configured to
 repeat the fresh migration and restricted-role suite. Hosted Supabase remains a separate user-run check.
 
+## Step 2.3 scope implemented
+
+- Atomic, append-only audit events for every workspace/membership mutation, including explicit no-op,
+  creation, removal, and voluntary-leave semantics.
+- Runtime-role write denial, owner/admin RLS reads, request correlation, bounded safe payloads, and
+  redacted structured security logs.
+- Cursor-paginated owner/admin audit API and responsive Settings history with server-side filters.
+- Restricted-role PostgreSQL integrity/authorization regression tests and mocked browser coverage.
+
+Step 2.3 was confirmed by the user before Step 3.1 began.
+
+## Step 2.3 verification record
+
+Executed locally on 2026-10-03 against an isolated PostgreSQL 17 Compose project. The user's existing
+local database volume was not modified.
+
+| Check                                     | Outcome                                                        |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| Backend Ruff lint and format              | PASS; 62 Python files formatted                                |
+| Backend full test suite                   | PASS; 66 tests                                                 |
+| Real PostgreSQL/RLS/audit tests           | PASS; 5 tests with the restricted runtime role                 |
+| Step 2.2 revision to audit-head migration | PASS; `20260928_0001` → `20261003_0002`                        |
+| Fresh complete Alembic chain              | PASS; empty disposable database reached `20261003_0002`        |
+| Frontend ESLint, Prettier, and TypeScript | PASS                                                           |
+| Frontend configuration/auth helper tests  | PASS; 7 tests                                                  |
+| Next.js production build                  | PASS; `/settings/audit` is a protected dynamic route           |
+| Default mocked browser suite              | PASS; 18 tests, 2 separately gated                             |
+| Focused workspace/audit browser suite     | PASS; 6 tests including target responsive widths               |
+| Real API process lifecycle browser gate   | PASS; 1 test                                                   |
+| Interactive in-app browser inspection     | **NOT RUN**; no browser session was connected                  |
+| Live Supabase/provider verification       | **NOT RUN**; no remote credentials or production database used |
+| Hosted GitHub Actions                     | **NOT RUN**; changes have not been pushed                      |
+
+Mocked browser checks prove the UI behavior but not PostgreSQL isolation. The separate restricted-role
+PostgreSQL checks above verify RLS, privilege denial, audit atomicity, and rollback behavior.
+
+## Step 3.1 scope implemented
+
+- Workspace-scoped company creation, stable cursor listing, bounded literal search, industry/country
+  filters, full detail, partial editing, reversible archive/restore, and optimistic versions.
+- Owner/admin/analyst mutations and viewer reads enforced in the UI, application services, RLS,
+  grants, and guarded database functions.
+- Atomic company audit actions with safe detail allowlists; list responses exclude private notes.
+- Responsive Prospects list/create/detail/edit flows with URL-backed filters, stale-request cancellation,
+  actionable empty/error states, and archive confirmation.
+- Focused schema, real PostgreSQL, and mocked browser regression coverage.
+
+Step 3.1 is awaiting user verification.
+
+## Step 3.1 verification record
+
+Executed locally on 2026-10-03 against an isolated PostgreSQL 17 Compose project. The configured
+development database and hosted Supabase project were not migrated.
+
+| Check                                           | Outcome                                                 |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| Fresh Alembic chain                             | PASS; empty disposable database reached `20261003_0003` |
+| Backend Ruff lint                               | PASS                                                    |
+| Backend full suite with real PostgreSQL         | PASS; 79 tests                                          |
+| Company RLS/permissions/concurrency/audit test  | PASS with restricted runtime role                       |
+| Frontend ESLint and TypeScript                  | PASS                                                    |
+| Next.js production build                        | PASS; all four Prospects routes generated               |
+| Default mocked browser suite                    | PASS; 22 tests, 2 separately gated                      |
+| Company responsive browser coverage             | PASS at 375, 768, and 1440 px                           |
+| Interactive in-app browser inspection           | NOT RUN; automated Chromium coverage was used           |
+| Hosted migration and live Supabase verification | NOT RUN; remote systems were not changed                |
+| Hosted GitHub Actions                           | NOT RUN; changes have not been pushed                   |
+
 ## Next planned step
 
-Step 2.3: audit logging and authorization tests. It is not implemented in Step 2.2.
+Step 3.2: company locations, canonical domains, duplicate prevention, and entity resolution. These are
+not implemented in Step 3.1.

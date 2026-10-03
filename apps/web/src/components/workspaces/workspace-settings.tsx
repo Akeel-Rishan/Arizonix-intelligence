@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { MemberList } from "@/components/workspaces/member-list";
 import { useWorkspace } from "@/components/workspaces/workspace-provider";
@@ -131,6 +132,20 @@ function WorkspaceSettingsContent({
           </p>
         ) : null}
       </section>
+      {canRename ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-lg font-semibold text-slate-950">Audit history</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Review committed workspace and membership changes for this workspace.
+          </p>
+          <Link
+            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
+            href="/settings/audit"
+          >
+            View audit history
+          </Link>
+        </section>
+      ) : null}
       <MemberList actorRole={activeWorkspace.role} workspaceId={activeWorkspace.id} />
     </div>
   );

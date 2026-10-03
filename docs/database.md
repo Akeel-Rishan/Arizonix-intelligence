@@ -62,11 +62,22 @@ Migration `20260928_0001` creates the schema, tables, constraints, indexes, trig
 guarded functions, and exact grants. The `alembic_version` table records application order. Alembic is
 the repository's only migration system.
 
+Migration `20261003_0002` adds the audit table, action enum, owner/admin read policy, request-context
+helper, internal writer, indexes, and audited/no-op-aware replacements for every guarded workspace and
+membership mutation. It captures changes committed after the migration; it does not backfill synthetic
+history. See [audit-logging.md](audit-logging.md).
+
+Migration `20261003_0003` adds companies, archive/version constraints, workspace-scoped RLS,
+filter/order indexes, exact runtime grants, role-checked mutation functions, and four company audit
+actions. It is not applied to a hosted project automatically. See
+[company-management.md](company-management.md).
+
 ## User and RLS behavior
 
 `application_users` contains UUID, optional display email, and timestamps—never passwords or copied JWT
 payloads. `workspaces` contains stable UUID, name, creator and timestamps. `memberships` has a composite
-workspace/user primary key, constrained role enum, foreign keys and lookup index. All timestamps are
+workspace/user primary key, constrained role enum, foreign keys and lookup index. `companies` preserves
+workspace/actor ownership, reversible archive state, and optimistic versions. All timestamps are
 timezone-aware with server defaults.
 
 RLS reads `arizonix.current_user_id()`, which parses only transaction-local

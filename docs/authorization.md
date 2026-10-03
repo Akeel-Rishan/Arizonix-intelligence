@@ -16,6 +16,9 @@ source of authorization, unknown roles fail validation, and no membership means 
 | Remove owner or admin                     | Yes, subject to last-owner rule | No    | No      | No     |
 | Remove analyst or viewer                  | Yes                             | Yes   | No      | No     |
 | Leave workspace                           | Yes, unless last owner          | Yes   | Yes     | Yes    |
+| Read workspace audit history              | Yes                             | Yes   | No      | No     |
+| List and read company records             | Yes                             | Yes   | Yes     | Yes    |
+| Create, edit, archive, or restore company | Yes                             | Yes   | Yes     | No     |
 
 An owner transfers practical ownership by promoting another member before leaving or demoting the old
 owner. A workspace row is locked during add, role-change, remove, and leave operations. The final-owner
@@ -28,6 +31,7 @@ Supabase access JWT
   -> FastAPI verifies signature, issuer, audience, time claims, and UUID subject
   -> API opens an explicit database transaction
   -> set_config('arizonix.user_id', verified subject, true)
+  -> set_config('arizonix.request_id', server UUID, true)
   -> profile is provisioned from the verified subject/email
   -> application permission check
   -> RLS policy and/or guarded mutation function checks the same transaction-local identity
@@ -36,8 +40,8 @@ Supabase access JWT
 
 The browser cannot submit the actor identity. Body `user_id` exists only where an exact target existing
 user is required. Workspace IDs select a resource but never establish access. Inaccessible workspace
-IDs return 404, known members without an administrative permission receive 403, and duplicate or
-last-owner conflicts receive controlled 409 responses.
+IDs return 404, known members without a required permission receive 403, and duplicate, last-owner,
+stale-version, or lifecycle conflicts receive controlled 409 responses.
 
 Transaction-local context is not JWT verification: the API performs cryptographic verification first.
 It protects against omitted tenant filters and prevents identity leakage between pooled requests. It
@@ -65,5 +69,9 @@ adds an existing user using the exact UUID shown in that user's Account card; th
 auth-account creation, or invitation. A disabled/deleted Supabase account cannot obtain a valid token,
 but automatic profile cleanup is deferred.
 
-Invitations, email delivery, business-data permissions, and the full audit log remain deferred. Step
-2.3 adds audit logging and deeper authorization testing without changing this matrix silently.
+Audit reads reload the current membership on every request. A demoted admin or removed member therefore
+loses access on the next request; UI visibility is not an authorization boundary. Audit events are
+additionally protected by owner/admin RLS. See [audit-logging.md](audit-logging.md).
+
+Company authorization is implemented; see [company-management.md](company-management.md). Invitations,
+email delivery, and permissions for later evidence/research records remain deferred.

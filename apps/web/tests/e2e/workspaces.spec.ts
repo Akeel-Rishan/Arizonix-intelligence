@@ -156,3 +156,88 @@ test("sign-out clears the workspace preference", async ({ page }) => {
     await page.evaluate(() => localStorage.getItem("arizonix.active-workspace.v1")),
   ).toBeNull();
 });
+
+test("owner can filter and paginate audit history without horizontal overflow", async ({
+  page,
+}) => {
+  await mockIdentity(page);
+  await page.route(`${apiBase}/workspaces?limit=100`, (route) =>
+    route.fulfill({
+      json: {
+        items: [workspace(firstId, "Northstar")],
+        limit: 100,
+        offset: 0,
+        has_more: false,
+      },
+    }),
+  );
+  const event = (id: string, action = "workspace.renamed") => ({
+    id,
+    workspace_id: firstId,
+    actor_user_id: userId,
+    action,
+    target_type: "workspace",
+    target_id: firstId,
+    occurred_at: "2026-10-03T08:30:00Z",
+    request_id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    event_schema_version: 1,
+    details: { previous_name: "Northstar", new_name: "Signal Lab" },
+  });
+  const firstEventId = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+  const secondEventId = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
+  await page.route(`**/workspaces/${firstId}/audit-events?*`, (route) => {
+    const url = new URL(route.request().url());
+    if (url.searchParams.has("cursor")) {
+      return route.fulfill({ json: { items: [event(secondEventId)], next_cursor: null } });
+    }
+    if (url.searchParams.get("action") === "membership.added") {
+      return route.fulfill({ json: { items: [], next_cursor: null } });
+    }
+    return route.fulfill({ json: { items: [event(firstEventId)], next_cursor: "next" } });
+  });
+
+  await signIn(page, "/settings/audit");
+  await expect(page.getByRole("heading", { name: "Audit history" })).toBeVisible();
+  await expect(page.getByText("Renamed the workspace")).toBeVisible();
+  await page.getByText("Event details").click();
+  await expect(page.getByText(firstEventId)).toBeVisible();
+  await page.getByRole("button", { name: "Load more" }).click();
+  await expect(page.getByText("Renamed the workspace")).toHaveCount(2);
+  await page.getByLabel("Action").selectOption("membership.added");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page.getByText("No events match these filters.")).toBeVisible();
+
+  for (const width of [375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        ),
+      )
+      .toBe(true);
+  }
+});
+
+test("viewer direct audit navigation is denied without fetching history", async ({ page }) => {
+  await mockIdentity(page);
+  await page.route(`${apiBase}/workspaces?limit=100`, (route) =>
+    route.fulfill({
+      json: {
+        items: [workspace(firstId, "Northstar", "viewer")],
+        limit: 100,
+        offset: 0,
+        has_more: false,
+      },
+    }),
+  );
+  let auditRequests = 0;
+  await page.route(`**/workspaces/${firstId}/audit-events?*`, (route) => {
+    auditRequests += 1;
+    return route.fulfill({ status: 403, json: { detail: { code: "permission_denied" } } });
+  });
+
+  await signIn(page, "/settings/audit");
+  await expect(page.getByText(/available only to workspace owners and admins/)).toBeVisible();
+  expect(auditRequests).toBe(0);
+});

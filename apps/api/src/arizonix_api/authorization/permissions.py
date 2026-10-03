@@ -37,3 +37,7 @@ def can_remove_member(actor: WorkspaceRole, target: WorkspaceRole) -> bool:
         WorkspaceRole.ANALYST,
         WorkspaceRole.VIEWER,
     }
+
+
+def can_mutate_company(role: WorkspaceRole) -> bool:
+    return role in {WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.ANALYST}
